@@ -4,6 +4,9 @@
 
 #### 截图
 
-![](https://github.com/callmexiaolu/MyApplication/blob/master/screen/login.png)
-![](https://github.com/callmexiaolu/MyApplication/blob/master/screen/registered.png)
-![](https://github.com/callmexiaolu/MyApplication/blob/master/screen/loginDone.png)
+<img src="screen/login.png" width=400 height=600  align=left /> 
+<br>
+<img src="screen/registered.png" width=400 height=600  align=left />
+<br>
+<img src="screen/loginDone.png" width=400 height=600  align=left />
+<br>
