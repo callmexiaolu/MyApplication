@@ -4,6 +4,7 @@ package com.example.myapplication.adapter;
  * Create by LuKaiqi on 2019/2/17.
  * function:
  */
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,12 +14,15 @@ public class MyViewPagerAdapter extends FragmentPagerAdapter {
 
     private List<Fragment> fragmentList;
 
+    private String[] mFragmentTitltes;
+
     public MyViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
-    public void setData(List<Fragment> fragmentList){
+    public void setData(List<Fragment> fragmentList, String[] titltes){
         this.fragmentList = fragmentList;
+        mFragmentTitltes = titltes;
     }
 
     @Override
@@ -31,4 +35,9 @@ public class MyViewPagerAdapter extends FragmentPagerAdapter {
         return fragmentList.size();
     }
 
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return mFragmentTitltes[position];
+    }
 }

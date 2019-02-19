@@ -7,10 +7,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import com.example.myapplication.R;
+import com.example.myapplication.fragment.Fragment1;
 import com.example.myapplication.fragment.Fragment2;
 import com.example.myapplication.fragment.Fragment3;
 import com.example.myapplication.fragment.Fragment4;
-import com.example.myapplication.fragment.IndexFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public void initData() {
         mFragments = new ArrayList<>();
-        mFragments.add(new IndexFragment());
+        mFragments.add(new Fragment1());
         mFragments.add(new Fragment2());
         mFragments.add(new Fragment3());
         mFragments.add(new Fragment4());
