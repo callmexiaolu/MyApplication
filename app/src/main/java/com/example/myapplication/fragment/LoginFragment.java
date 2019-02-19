@@ -1,12 +1,12 @@
 package com.example.myapplication.fragment;
 
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
+import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
 
@@ -42,7 +42,7 @@ public class LoginFragment extends BaseFragment {
             public void onClick(View v) {
                 String mEtLoginNameInput = mEtLoginName.getText().toString();
                 String mEtLoginPasswordInput = mEtLoginPassword.getText().toString();
-                if (!TextUtils.isEmpty(mEtLoginNameInput) && !TextUtils.isEmpty(mEtLoginPasswordInput)) {
+                if (!StringUtil.isEmpty(mEtLoginNameInput) && !StringUtil.isEmpty(mEtLoginPasswordInput)) {
                     loginInterface.sureLogin(mEtLoginNameInput, mEtLoginPasswordInput);
                 } else {
                     ToastUtil.showToast(MyApplication.getAppContext(), "账号密码不能为空", true);

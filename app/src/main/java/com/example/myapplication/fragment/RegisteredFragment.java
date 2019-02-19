@@ -1,26 +1,14 @@
 package com.example.myapplication.fragment;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
-import com.example.myapplication.activity.LoginOrRegisteredActivity;
-import com.example.myapplication.bean.User;
-import com.example.myapplication.db.UserTable;
-import com.example.myapplication.dbutil.TableOperate;
-import com.example.myapplication.util.EncryptUtil;
+import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
-import java.util.ArrayList;
 
 /**
  * Create by LuKaiqi on 2019/2/1.
@@ -55,7 +43,7 @@ public class RegisteredFragment extends BaseFragment{
             public void onClick(View v) {
                 String nameString = mEtRegisteredName.getText().toString();
                 String passwordString = mEtRegisteredPassword.getText().toString();
-                if (!TextUtils.isEmpty(nameString) && !TextUtils.isEmpty(passwordString)) {
+                if (!StringUtil.isEmpty(nameString) && !StringUtil.isEmpty(passwordString)) {
                     registeredInterface.sureRegistered(nameString, passwordString);
                 } else {
                     ToastUtil.showToast(MyApplication.getAppContext(), "名字或密码不能为空", true);

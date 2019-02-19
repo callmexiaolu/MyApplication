@@ -16,7 +16,7 @@ public abstract class BaseActivity extends FragmentActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(setRootLayoutId());
         initViews();
-        initData();
+        initData(savedInstanceState);
         initListener();
     }
 
@@ -34,7 +34,7 @@ public abstract class BaseActivity extends FragmentActivity {
     /**
      * 初始化数据
      */
-    public abstract void initData();
+    public abstract void initData(@Nullable Bundle savedInstanceState);
 
     /**
      * 初始化监听器

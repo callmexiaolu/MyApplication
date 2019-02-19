@@ -1,6 +1,8 @@
 package com.example.myapplication.activity;
 
 import android.graphics.Color;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -37,7 +39,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void initData() {
+    public void initData(@Nullable Bundle savedInstanceState) {
         mFragments = new ArrayList<>();
         mFragments.add(new Fragment1());
         mFragments.add(new Fragment2());

@@ -1,7 +1,7 @@
 package com.example.myapplication.util;
 
-import android.text.TextUtils;
 
+import android.text.TextUtils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
  * Create by LuKaiqi on 2019/1/23.
  * function:加密工具类
  */
-public class EncryptUtil {
+public class StringUtil {
 
     /**
      * MD5 加盐加密 盐值：lukaiqi  因此加密字符串为：password+lukaiqi
@@ -43,4 +43,19 @@ public class EncryptUtil {
         }
         return "";
     }
+
+    /**
+     * 字符串检测：非空,不能为非法字符"null"
+     * @param string
+     * @return
+     */
+    public static boolean isEmpty(String string) {
+        if (string == null || string.trim().length() == 0 ||
+                string.trim().equalsIgnoreCase("null") || string.contains(" ")) {
+            return true;
+        }
+        return false;
+    }
+
+
 }

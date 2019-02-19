@@ -1,16 +1,12 @@
 package com.example.myapplication.util;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.activity.MainActivity;
 import com.example.myapplication.bean.MyBmobUser;
-import com.example.myapplication.bean.User;
-import com.example.myapplication.db.UserTable;
-import com.example.myapplication.dbutil.TableOperate;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.LogInListener;
@@ -30,8 +26,8 @@ public class UserUtil {
      */
     public static void userLogin(final String name, final String password, final Activity activity) {
         //此处对密码进行加密操作,然后从服务器读取加密后的密码进行对比
-        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(password)) {
-            final String encryptPassword = EncryptUtil.encryptPassword(password);
+        if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(password)) {
+            final String encryptPassword = StringUtil.encryptPassword(password);
             BmobUser.loginByAccount(name, encryptPassword, new LogInListener<MyBmobUser>() {
                 @Override
                 public void done(MyBmobUser myBmobUser, BmobException e) {
@@ -66,7 +62,7 @@ public class UserUtil {
      */
     public static void userRegisteredByName(final String name, final String password, final Activity activity) {
         if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(password)) {
-            final String encryptPassword = EncryptUtil.encryptPassword(password);
+            final String encryptPassword = StringUtil.encryptPassword(password);
             MyBmobUser bmobUser = new MyBmobUser();
             bmobUser.setUsername(name);
             bmobUser.setPassword(encryptPassword);
