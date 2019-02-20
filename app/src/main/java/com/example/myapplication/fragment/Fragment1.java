@@ -1,18 +1,14 @@
 package com.example.myapplication.fragment;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import com.example.myapplication.R;
 import com.example.myapplication.adapter.MyViewPagerAdapter;
-import com.example.myapplication.fragment.indexFragment.BuyFragment;
+import com.example.myapplication.fragment.indexFragment.BookFragment;
 import com.example.myapplication.fragment.indexFragment.FindFragment;
 import com.example.myapplication.fragment.indexFragment.LostFragment;
-import com.example.myapplication.fragment.indexFragment.SellFragment;
 import com.example.myapplication.widget.ViewPagerIndicator;
 
 import java.util.ArrayList;
@@ -27,7 +23,7 @@ public class Fragment1 extends BaseFragment{
 
     private ViewPager mViewPagerHome;
 
-    private String[] mFragmentTitles = new String[]{"求购", "出售", "失物招领", "物品找回"};
+    private String[] mFragmentTitles = new String[]{"二手书", "失物招领", "物品找回"};
 
     private List<Fragment> mFragmentList;
     private FragmentManager mFragmentManager;
@@ -49,12 +45,12 @@ public class Fragment1 extends BaseFragment{
         mFragmentManager = getActivity().getSupportFragmentManager();
         mAdapter = new MyViewPagerAdapter(mFragmentManager);
         mFragmentList = new ArrayList<>();
-        mFragmentList.add(new BuyFragment());
-        mFragmentList.add(new SellFragment());
+        mFragmentList.add(new BookFragment());
         mFragmentList.add(new LostFragment());
         mFragmentList.add(new FindFragment());
         mAdapter.setData(mFragmentList, mFragmentTitles);
         mViewPagerHome.setAdapter(mAdapter);
+        mViewPagerHome.setOffscreenPageLimit(4);
         mPagerIndicatorHome.setViewPager(mViewPagerHome);
     }
 

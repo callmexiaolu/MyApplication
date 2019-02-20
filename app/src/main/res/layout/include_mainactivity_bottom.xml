@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RadioGroup
+        android:id="@+id/rg_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#4bd2d2d2"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbtn_1"
+            style="@style/activity_main_radio_button"
+            android:drawableTop="@drawable/rbtn_home"
+            android:text="@string/rbtn_1" />
+
+        <RadioButton
+            android:id="@+id/rbtn_2"
+            style="@style/activity_main_radio_button"
+            android:drawableTop="@drawable/rbtn_follow"
+            android:text="@string/rbtn_2" />
+
+        <RadioButton
+            android:id="@+id/rbtn_3"
+            style="@style/activity_main_radio_button"
+            android:drawableTop="@drawable/rbtn_business"
+            android:text="@string/rbtn_3" />
+
+        <RadioButton
+            android:id="@+id/rbtn_4"
+            style="@style/activity_main_radio_button"
+            android:drawableTop="@drawable/rbtn_me"
+            android:text="@string/rbtn_4" />
+    </RadioGroup>
+
+</RelativeLayout>

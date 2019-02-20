@@ -22,17 +22,6 @@ import java.util.List;
 
 public class LoginOrRegisteredActivity extends BaseActivity {
 
-    private String[] mPermissions = new String[]{
-            Manifest.permission.INTERNET,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE,
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.WAKE_LOCK
-    }; //申请权限
-
-    List<String> mRefusePermissions = new ArrayList<>();//用户拒绝的权限
-
     private final FragmentManager mFragmentManager = getSupportFragmentManager();
 
     private LoginFragment mLoginFragment;
@@ -55,7 +44,6 @@ public class LoginOrRegisteredActivity extends BaseActivity {
 
     @Override
     public void initData(@Nullable Bundle savedInstanceState) {
-        permissionCheck();
         initFragment(savedInstanceState);//初始化fragment
         if (savedInstanceState == null) {
             setDefaultFragment();//设置默认展示的fragment
@@ -141,37 +129,6 @@ public class LoginOrRegisteredActivity extends BaseActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private void permissionCheck() {
-        mRefusePermissions.clear();
-        for (int i = 0; i < mPermissions.length; i++) {
-            if (ContextCompat.checkSelfPermission(LoginOrRegisteredActivity.this, mPermissions[i]) != PackageManager.PERMISSION_GRANTED) {
-                mRefusePermissions.add(mPermissions[i]);
-            }
-        }
-        if (mRefusePermissions.size() > 0) {
-            //拒绝权限不为空，表示某些权限没接受
-            String[] mRefuse = mRefusePermissions.toArray(new String[mRefusePermissions.size()]);
-            ActivityCompat.requestPermissions(LoginOrRegisteredActivity.this, mRefuse, 1);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        boolean mPermissionDismiss = false;//有权限没通过
-        switch (requestCode) {
-            case 1: {
-                for (int i = 0; i < grantResults.length; i++) {
-                    if (grantResults[i] == -1) {
-                        mPermissionDismiss = true;
-                        break;
-                    }
-                }
-            }
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (mLoginFragment != null) {
@@ -181,5 +138,13 @@ public class LoginOrRegisteredActivity extends BaseActivity {
             getSupportFragmentManager().putFragment(outState, REGISTERED_FRAGMENT_KEY, mRegisteredFragment);
         }
         super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * 返回键，退出当前activity，回到MainActivity
+     */
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

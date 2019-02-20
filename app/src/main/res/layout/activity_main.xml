@@ -14,8 +14,8 @@
         android:layout_weight="1"/>
 
     <include
-        layout="@layout/include_bottom"
-        android:layout_height="56dp"
+        layout="@layout/include_mainactivity_bottom"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent" />
 
 </LinearLayout>

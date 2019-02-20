@@ -118,6 +118,10 @@ public class ViewPagerIndicator extends HorizontalScrollView implements View.OnC
         textView.setLayoutParams(layoutParams);
     }
 
+    /**
+     * 设置当前的顶部导航栏tab
+     * @param item
+     */
     private void setCurrentTab(int item) {
         int childCount = mLinearLayout.getChildCount();
         if (item <= childCount -1) {

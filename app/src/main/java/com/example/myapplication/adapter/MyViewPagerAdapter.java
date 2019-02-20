@@ -14,7 +14,7 @@ public class MyViewPagerAdapter extends FragmentPagerAdapter {
 
     private List<Fragment> fragmentList;
 
-    private String[] mFragmentTitltes;
+    private String[] mFragmentTitles;
 
     public MyViewPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -22,7 +22,7 @@ public class MyViewPagerAdapter extends FragmentPagerAdapter {
 
     public void setData(List<Fragment> fragmentList, String[] titltes){
         this.fragmentList = fragmentList;
-        mFragmentTitltes = titltes;
+        mFragmentTitles = titltes;
     }
 
     @Override
@@ -38,6 +38,6 @@ public class MyViewPagerAdapter extends FragmentPagerAdapter {
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        return mFragmentTitltes[position];
+        return mFragmentTitles[position];
     }
 }

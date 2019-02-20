@@ -41,11 +41,4 @@ public abstract class BaseActivity extends FragmentActivity {
      */
     public abstract void initListener();
 
-    /**
-     * 返回键，返回到桌面进入后台，而不是退出
-     */
-    @Override
-    public void onBackPressed() {
-        moveTaskToBack(true);
-    }
 }

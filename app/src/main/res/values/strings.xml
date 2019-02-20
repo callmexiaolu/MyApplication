@@ -21,5 +21,7 @@
 
     <string name="rbtn_4">我</string>
 
+    <string name="tv_fragment4_login_registered">登录/注册</string>
+    <string name="tv_fragment4_introduction">添加个人签名</string>
 
 </resources>
