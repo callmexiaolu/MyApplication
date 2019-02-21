@@ -11,9 +11,11 @@
     <color name="transparent">#00000000</color>
     <color name="search_view_color">#d5ed4a4a</color>
     
-    <color name="fragment4_background">#EDEDED</color>
+    <color name="fragment4_background">#11fcfcfc</color>
 
     <!-- 首页顶部导航栏分隔线颜色-->
     <color name="fragment1_line_color">#DCDCDC</color>
+
+    <color name="font_color">#3B3B3B</color>
 
 </resources>

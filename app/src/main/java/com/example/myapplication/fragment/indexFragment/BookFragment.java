@@ -79,7 +79,7 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
      */
     private void initRecyclerView() {
         mRecyclerViewBook.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        mRecyclerViewBook.setAdapter();
+        //mRecyclerViewBook.setAdapter();
     }
 
     @Override

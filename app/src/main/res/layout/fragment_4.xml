@@ -12,19 +12,142 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
 
-    <RelativeLayout
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <RelativeLayout style="@style/fragment4_ll">
+
+            <TextView
+                android:id="@+id/tv_fragment4_post_number"
+                style="@style/fragment4_rl_tv_up"
+                android:text="0" />
+
+            <TextView
+                style="@style/fragment4_rl_tv_down"
+                android:layout_below="@+id/tv_fragment4_post_number"
+                android:text="@string/post_string" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout style="@style/fragment4_ll">
+
+            <TextView
+                android:id="@+id/tv_fragment4_follow_number"
+                style="@style/fragment4_rl_tv_up"
+                android:text="0" />
+
+            <TextView
+                style="@style/fragment4_rl_tv_down"
+                android:layout_below="@+id/tv_fragment4_follow_number"
+                android:text="@string/follow_string" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout style="@style/fragment4_ll">
+
+            <TextView
+                android:id="@+id/tv_fragment4_fans_number"
+                style="@style/fragment4_rl_tv_up"
+                android:text="0" />
+
+            <TextView
+                style="@style/fragment4_rl_tv_down"
+                android:layout_below="@+id/tv_fragment4_fans_number"
+                android:text="@string/fans_string" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout style="@style/fragment4_ll">
+
+            <TextView
+                android:id="@+id/tv_fragment4_thumb_up_number"
+                style="@style/fragment4_rl_tv_up"
+                android:text="0" />
+
+            <TextView
+                style="@style/fragment4_rl_tv_down"
+                android:layout_below="@+id/tv_fragment4_thumb_up_number"
+                android:text="@string/thumb_up_string" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_fragment4_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5">
+        android:layout_weight="5"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/ll_fragment4_property"
+            style="@style/fragment4_ll_list">
+
+            <ImageView
+                android:src="@drawable/ic_action_my_collection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/fragment4_rl_tv_right"
+                android:text="@string/collection"/>
+
+        </LinearLayout>
+
+        <View
+            android:background="@color/fragment1_line_color"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@color/white" />
+            android:layout_height="0.5dp" />
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+           style="@style/fragment4_ll_list">
+
+            <ImageView
+                android:src="@drawable/ic_action_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/fragment4_rl_tv_right"
+                android:text="@string/app_about"/>
+
+        </LinearLayout>
+
+        <View
+            android:background="@color/fragment1_line_color"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp" />
 
 
-    </RelativeLayout>
+        <LinearLayout
+           style="@style/fragment4_ll_list">
+
+            <ImageView
+                android:src="@drawable/ic_action_setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/fragment4_rl_tv_right"
+                android:text="@string/app_setting"/>
+
+        </LinearLayout>
+
+        <View
+            android:background="@color/fragment1_line_color"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp" />
+
+    </LinearLayout>
 
 </LinearLayout>

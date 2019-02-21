@@ -2,6 +2,7 @@ package com.example.myapplication.fragment;
 
 import android.content.Intent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.example.myapplication.R;
@@ -44,7 +45,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.rl_fragment4_top_root: {
-                startActivity(new Intent(getActivity(), LoginOrRegisteredActivity.class));
+                startActivityForResult(new Intent(getActivity(), LoginOrRegisteredActivity.class), 1);
                 break;
             }
         }

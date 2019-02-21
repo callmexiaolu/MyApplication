@@ -101,7 +101,7 @@ public class ViewPagerIndicator extends HorizontalScrollView implements View.OnC
         textView.setTextColor(mDefaultTitleColor);
         textView.setClickable(true);
         textView.setOnClickListener(this);
-        textView.setTextSize(20);
+        textView.setTextSize(15);
         addLayout(textView);
         return textView;
     }

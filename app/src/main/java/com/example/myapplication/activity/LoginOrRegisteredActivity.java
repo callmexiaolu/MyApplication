@@ -1,6 +1,8 @@
 package com.example.myapplication.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -120,31 +122,11 @@ public class LoginOrRegisteredActivity extends BaseActivity {
     }
 
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            moveTaskToBack(true);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (mLoginFragment != null) {
-            getSupportFragmentManager().putFragment(outState, LOGIN_FRAGMENT_KEY, mLoginFragment);
-        }
-        if (mRegisteredFragment != null) {
-            getSupportFragmentManager().putFragment(outState, REGISTERED_FRAGMENT_KEY, mRegisteredFragment);
-        }
-        super.onSaveInstanceState(outState);
-    }
-
     /**
      * 返回键，退出当前activity，回到MainActivity
      */
     @Override
     public void onBackPressed() {
-        finish();
+        this.finish();
     }
 }

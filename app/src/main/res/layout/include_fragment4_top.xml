@@ -4,7 +4,7 @@
     android:id="@+id/rl_fragment4_top_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorAccent">
+    android:background="@drawable/login_background">
 
     <ImageView
         android:id="@+id/iv_fragment4_user_avatar"
@@ -12,7 +12,7 @@
         android:layout_height="50dp"
         android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
-        android:src="@drawable/shoucang"/>
+        android:src="@drawable/user_login"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -25,12 +25,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:text="@string/tv_fragment4_login_registered" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:textColor="@color/white"
             android:text="@string/tv_fragment4_introduction" />
     </LinearLayout>
 

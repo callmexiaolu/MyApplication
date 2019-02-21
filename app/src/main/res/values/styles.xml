@@ -28,4 +28,48 @@
         <item name="android:textSize">10sp</item>
     </style>
 
+    <!-- 我的界面，关注，粉丝，帖子模块格式 -->
+    <style name="fragment4_ll">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <!-- 我的界面中 上面的textview格式 -->
+    <style name="fragment4_rl_tv_up">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!-- 我的界面中 下面的textview格式 -->
+    <style name="fragment4_rl_tv_down">
+        <item name="android:layout_marginTop">3dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/font_color</item>
+    </style>
+
+    <!-- 我的界面中 图标右边的textview格式 -->
+    <style name="fragment4_rl_tv_right">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/font_color</item>
+    </style>
+
+    <!-- 展示设置，收藏等item 的linearLayout样式 -->
+    <style name="fragment4_ll_list">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
 </resources>

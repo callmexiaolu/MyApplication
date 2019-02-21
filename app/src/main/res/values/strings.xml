@@ -9,6 +9,12 @@
 
     <string name="btn_go_to_registered">没有账号?现在注册</string>
 
+    <string name="login_by_third">第三方登陆</string>
+
+    <string name="we_chat">微信</string>
+
+    <string name="qq">QQ</string>
+
     <string name="et_user_name">用户名</string>
 
     <string name="et_user_password">用户密码</string>
@@ -24,4 +30,12 @@
     <string name="tv_fragment4_login_registered">登录/注册</string>
     <string name="tv_fragment4_introduction">添加个人签名</string>
 
+    <string name="follow_string">关注</string>
+    <string name="fans_string">粉丝</string>
+    <string name="thumb_up_string">获赞</string>
+    <string name="post_string">帖子</string>
+
+    <string name="collection">我的收藏</string>
+    <string name="app_about">产品关于</string>
+    <string name="app_setting">应用设置</string>
 </resources>
