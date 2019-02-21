@@ -18,4 +18,12 @@
 
     <color name="font_color">#3B3B3B</color>
 
+    <color name="login_area">#c80a00</color>
+
+    <!-- 忘记密码？ 的颜色 -->
+    <color name="blue">#1C86EE</color>
+
+    <color name="we_chat_font">#28960e</color>
+    <color name="qq_font">#4cafe9</color>
+
 </resources>

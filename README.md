@@ -6,7 +6,7 @@
 
 <img src="screen/login.png" width=400 height=600  align=left /> 
 <br>
-<img src="screen/registered.png" width=400 height=600  align=left />
-<br>
 <img src="screen/loginDone.png" width=400 height=600  align=left />
+<br>
+<img src="screen/me.png" width=400 height=600  align=left />
 <br>

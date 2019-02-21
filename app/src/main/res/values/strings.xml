@@ -9,15 +9,17 @@
 
     <string name="btn_go_to_registered">没有账号?现在注册</string>
 
-    <string name="login_by_third">第三方登陆</string>
+    <string name="login_by_third">第三方登录</string>
+    <string name="login_by_phone">免密登录</string>
+    <string name="forget_password">忘记密码?</string>
 
     <string name="we_chat">微信</string>
 
     <string name="qq">QQ</string>
 
-    <string name="et_user_name">用户名</string>
+    <string name="et_user_name">用户名/邮箱/手机号</string>
 
-    <string name="et_user_password">用户密码</string>
+    <string name="et_user_password">密码</string>
 
     <string name="rbtn_1">首页</string>
 
