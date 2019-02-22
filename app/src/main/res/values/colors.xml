@@ -26,4 +26,7 @@
     <color name="we_chat_font">#28960e</color>
     <color name="qq_font">#4cafe9</color>
 
+    <color name="start_color">#74e9cccc</color>
+    <color name="end_color">#b7e74141</color>
+
 </resources>

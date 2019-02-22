@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">GBook</string>
 
     <string name="btn_login">登录</string>
 
@@ -11,6 +11,10 @@
 
     <string name="login_by_third">第三方登录</string>
     <string name="login_by_phone">免密登录</string>
+    <string name="login_by_account">账号登陆</string>
+    <string name="phone_number">手机号</string>
+    <string name="phone_verification_code">手机验证码</string>
+    <string name="get_phone_verification_code">获取验证码</string>
     <string name="forget_password">忘记密码?</string>
 
     <string name="we_chat">微信</string>

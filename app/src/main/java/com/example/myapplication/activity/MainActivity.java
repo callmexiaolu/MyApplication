@@ -177,21 +177,4 @@ public class MainActivity extends BaseActivity {
         moveTaskToBack(true);
     }
 
-    /*@Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(CURRENT_FRAGMENT, mCurrent);
-        if (mFragment1 != null) {
-            getSupportFragmentManager().putFragment(outState, FRAGMENT_1_KEY, mFragment1);
-        }
-        if (mFragment2 != null) {
-            getSupportFragmentManager().putFragment(outState, FRAGMENT_2_KEY, mFragment2);
-        }
-        if (mFragment3 != null) {
-            getSupportFragmentManager().putFragment(outState, FRAGMENT_3_KEY, mFragment3);
-        }
-        if (mFragment4 != null) {
-            getSupportFragmentManager().putFragment(outState, FRAGMENT_4_KEY, mFragment4);
-        }
-        super.onSaveInstanceState(outState);
-    }*/
 }
