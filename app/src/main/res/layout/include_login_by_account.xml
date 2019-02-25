@@ -19,6 +19,9 @@
             android:src="@drawable/ic_action_login_me"/>
 
         <EditText
+            android:id="@+id/et_user_account"
+            android:inputType="text"
+            android:maxLines="1"
             style="?android:attr/textViewStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -42,6 +45,10 @@
             android:src="@drawable/ic_action_login_password"/>
 
         <EditText
+            android:id="@+id/et_user_password"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:maxLength="18"
             style="?android:attr/textViewStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -5,10 +5,6 @@
 
     <string name="btn_register">注册</string>
 
-    <string name="btn_go_to_login_">已有账号？直接登录</string>
-
-    <string name="btn_go_to_registered">没有账号?现在注册</string>
-
     <string name="login_by_third">第三方登录</string>
     <string name="login_by_phone">免密登录</string>
     <string name="login_by_account">账号登陆</string>

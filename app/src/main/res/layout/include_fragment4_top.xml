@@ -23,12 +23,14 @@
         android:layout_toRightOf="@+id/iv_fragment4_user_avatar">
 
         <TextView
+            android:id="@+id/tv_fragment4_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:text="@string/tv_fragment4_login_registered" />
 
         <TextView
+            android:id="@+id/tv_fragment4_user_signature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
