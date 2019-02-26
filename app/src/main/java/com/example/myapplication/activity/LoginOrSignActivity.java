@@ -15,10 +15,13 @@ import com.example.myapplication.service.LoginServiceImpl;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
-
+/**
+ * Create By LuKaiqi
+ * Describe:登录
+ */
 public class LoginOrSignActivity extends BaseActivity implements View.OnClickListener{
 
-    private ImageView    mIvBackToFragment4;
+    private ImageView mIvBackToFragment;
     private TextView     mTvLoginWithoutPassword, mTvLoginWithAccount;
     private LinearLayout mLlLoginWithAccount, mLlLoginWithoutPassword;
 
@@ -40,7 +43,7 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
 
     @Override
     public void initViews() {
-        mIvBackToFragment4      = findViewById(R.id.iv_back_to_fragment4);
+        mIvBackToFragment = findViewById(R.id.iv_back_to_fragment);
         mTvLoginWithoutPassword = findViewById(R.id.tv_login_without_password);
         mTvLoginWithAccount     = findViewById(R.id.tv_login_with_account);
         mLlLoginWithAccount     = findViewById(R.id.ll_user_login_with_account);
@@ -61,42 +64,44 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
 
     @Override
     public void initData(@Nullable Bundle savedInstanceState) {
-        mIvBackToFragment4.setClickable(true);
-        mIvBackToFragment4.setFocusable(true);
 
-        mTvLoginWithoutPassword.setClickable(true);
-        mTvLoginWithoutPassword.setFocusable(true);
-        mTvLoginWithoutPassword.setVisibility(View.VISIBLE);
-
-        mTvLoginWithAccount.setClickable(true);
-        mTvLoginWithAccount.setFocusable(true);
-        mTvLoginWithAccount.setVisibility(View.GONE);
-
-        mLlLoginWithAccount.setVisibility(View.VISIBLE);
-        mLlLoginWithoutPassword.setVisibility(View.GONE);
-
-        mTvUserGetPhoneCode.setClickable(true);
-        mTvUserGetPhoneCode.setFocusable(true);
-
-        mTvUserForgetPassword.setClickable(true);
-        mTvUserForgetPassword.setFocusable(true);
-
-        mLlUserLoginWithWeChat.setClickable(true);
-        mLlUserLoginWithWeChat.setFocusable(true);
-
-        mLlUserLoginWithQQ.setClickable(true);
-        mLlUserLoginWithQQ.setFocusable(true);
     }
 
     @Override
     public void initListener() {
-        mIvBackToFragment4.setOnClickListener(this);
+        mIvBackToFragment.setClickable(true);
+        mIvBackToFragment.setFocusable(true);
+        mIvBackToFragment.setOnClickListener(this);
+
+        mLlLoginWithAccount.setVisibility(View.VISIBLE);
+        mLlLoginWithoutPassword.setVisibility(View.GONE);
+
+        mTvLoginWithoutPassword.setClickable(true);
+        mTvLoginWithoutPassword.setFocusable(true);
+        mTvLoginWithoutPassword.setVisibility(View.VISIBLE);
         mTvLoginWithoutPassword.setOnClickListener(this);
+
+        mTvLoginWithAccount.setClickable(true);
+        mTvLoginWithAccount.setFocusable(true);
+        mTvLoginWithAccount.setVisibility(View.GONE);
         mTvLoginWithAccount.setOnClickListener(this);
+
         mBtnUserSureLogin.setOnClickListener(this);
+
+        mTvUserGetPhoneCode.setClickable(true);
+        mTvUserGetPhoneCode.setFocusable(true);
         mTvUserGetPhoneCode.setOnClickListener(this);
+
+        mTvUserForgetPassword.setClickable(true);
+        mTvUserForgetPassword.setFocusable(true);
         mTvUserForgetPassword.setOnClickListener(this);
+
+        mLlUserLoginWithWeChat.setClickable(true);
+        mLlUserLoginWithWeChat.setFocusable(true);
         mLlUserLoginWithWeChat.setOnClickListener(this);
+
+        mLlUserLoginWithQQ.setClickable(true);
+        mLlUserLoginWithQQ.setFocusable(true);
         mLlUserLoginWithQQ.setOnClickListener(this);
     }
 
@@ -114,16 +119,16 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
 
-            case R.id.iv_back_to_fragment4://返回
+            case R.id.iv_back_to_fragment://返回
                 this.finish();
                 break;
 
             case R.id.tv_login_without_password://免密登录
-                userAccountToLogin(true);
+                userAccountToLogin(false);
                 break;
 
             case R.id.tv_login_with_account://账号登录
-                userAccountToLogin(false);
+                userAccountToLogin(true);
                 break;
 
             case R.id.btn_user_sure_login://确定登录
@@ -144,7 +149,9 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
                 break;
 
             case R.id.tv_get_phone_code://获取验证码
-                mLoginService.userGetPhoneCode(mEtUserPhoneNumber.getText().toString());
+                if (phoneCodeCountTime()) {
+                    mLoginService.userGetPhoneCode(mEtUserPhoneNumber.getText().toString());
+                }
                 break;
 
             case R.id.tv_user_forget_password://忘记密码
@@ -163,11 +170,20 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
      * @param flag true 使用账号密码登录 false 使用免密登录
      */
     private void userAccountToLogin(boolean flag) {
-        mTvLoginWithoutPassword.setVisibility(flag? View.GONE : View.VISIBLE);
-        mLlLoginWithAccount.setVisibility(flag? View.GONE : View.VISIBLE);
-        mTvLoginWithAccount.setVisibility(flag? View.VISIBLE : View.GONE);
-        mLlLoginWithoutPassword.setVisibility(flag? View.VISIBLE : View.GONE);
+        mTvLoginWithoutPassword.setVisibility(flag? View.VISIBLE : View.GONE);
+        mLlLoginWithAccount.setVisibility(flag? View.VISIBLE : View.GONE);
+        mTvLoginWithAccount.setVisibility(flag? View.GONE : View.VISIBLE);
+        mLlLoginWithoutPassword.setVisibility(flag? View.GONE : View.VISIBLE);
         CURRENT_LOGIN_MODE = flag;
     }
 
+    /**
+     * 获取验证码后倒计时
+     * @return true 倒计时结束  false 倒计时未结束，不发送短信
+     */
+    private boolean phoneCodeCountTime() {
+        mTvUserGetPhoneCode.setClickable(false);
+        mTvUserGetPhoneCode.setFocusable(false);
+        return true;
+    }
 }

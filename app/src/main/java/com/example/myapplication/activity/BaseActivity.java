@@ -7,6 +7,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.view.Window;
 
+/**
+ * Create By LuKaiqi
+ * Describe：Activity基类
+ */
 public abstract class BaseActivity extends FragmentActivity {
 
     @Override

@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="10dp"
         android:background="@color/white"
         android:orientation="horizontal">
 
@@ -90,6 +91,7 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/ll_app_my_collection"
             style="@style/fragment4_ll_list">
 
             <ImageView
@@ -109,8 +111,9 @@
             android:layout_height="0.5dp" />
 
         <LinearLayout
+            android:id="@+id/ll_app_about"
             android:layout_marginTop="10dp"
-           style="@style/fragment4_ll_list">
+            style="@style/fragment4_ll_list">
 
             <ImageView
                 android:src="@drawable/ic_action_about"
@@ -130,6 +133,7 @@
 
 
         <LinearLayout
+            android:id="@+id/ll_app_settings"
            style="@style/fragment4_ll_list">
 
             <ImageView

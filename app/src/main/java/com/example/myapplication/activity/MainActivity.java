@@ -22,6 +22,10 @@ import com.example.myapplication.fragment.Fragment4;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Create By LuKaiqi 2019/02/26
+ * Describe:主界面
+ */
 public class MainActivity extends BaseActivity {
 
     private List<Fragment> mFragments;

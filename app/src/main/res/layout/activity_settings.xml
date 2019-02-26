@@ -1,9 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/fragment4_background"
     tools:context=".activity.SettingsActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <RelativeLayout
+        style="@style/settings_item">
+
+        <include
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            layout="@layout/include_back_to_fragment"/>
+
+        <TextView
+            style="@style/settings_tv1"
+            android:text="@string/settings_name"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        style="@style/settings_item"
+        android:layout_marginTop="1dp">
+
+        <TextView
+            style="@style/settings_tv2"
+            android:text="@string/settings_push" />
+
+        <Switch
+            android:id="@+id/switch_settings_push"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        style="@style/settings_item"
+        android:layout_marginTop="1dp">
+
+        <TextView
+           style="@style/settings_tv2"
+            android:text="@string/settings_night_mode"/>
+
+        <Switch
+            android:id="@+id/switch_settings_night_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_settings_clear_cache"
+        style="@style/settings_item"
+        android:layout_marginTop="1dp">
+
+        <TextView
+           style="@style/settings_tv2"
+            android:text="@string/settings_clear_cache"/>
+
+        <TextView
+            android:id="@+id/tv_settings_app_cache"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:textSize="16sp"
+            android:text="0.0MB" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        style="@style/settings_item"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            style="@style/settings_tv2"
+            android:text="@string/settings_version"/>
+
+        <TextView
+            android:id="@+id/tv_settings_app_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:textSize="16sp"
+            android:text="v 1.1.0"/>
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:padding="10dp"
+        android:textSize="13sp"
+        android:text="@string/settings_introduction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:id="@+id/rl_settings_login_out"
+        android:visibility="visible"
+        style="@style/settings_item"
+        android:layout_marginTop="1dp">
+
+        <TextView
+            style="@style/settings_tv2"
+            android:text="@string/settings_login_out"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

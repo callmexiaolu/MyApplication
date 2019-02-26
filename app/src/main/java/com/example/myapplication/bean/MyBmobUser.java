@@ -1,5 +1,7 @@
 package com.example.myapplication.bean;
 
+import com.example.myapplication.util.StringUtil;
+
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 
@@ -22,7 +24,7 @@ public class MyBmobUser extends BmobUser {
     private String thumbUp;//获赞数
 
     public String getPostCount() {
-        return postCount;
+        return StringUtil.isEmpty(postCount) ? "0" : postCount;
     }
 
     public void setPostCount(String postCount) {
@@ -30,7 +32,7 @@ public class MyBmobUser extends BmobUser {
     }
 
     public String getFollowCount() {
-        return followCount;
+        return StringUtil.isEmpty(followCount) ? "0" : followCount;
     }
 
     public void setFollowCount(String followCount) {
@@ -38,17 +40,15 @@ public class MyBmobUser extends BmobUser {
     }
 
     public String getThumbUp() {
-        return thumbUp;
+        return StringUtil.isEmpty(thumbUp) ? "0" : thumbUp;
     }
 
     public void setThumbUp(String thumbUp) {
         this.thumbUp = thumbUp;
     }
 
-
-
     public String getFans() {
-        return fans == null ? "0" : fans;
+        return StringUtil.isEmpty(fans) ? "0" : fans;
     }
 
     public void setFans(String fans) {
@@ -56,7 +56,7 @@ public class MyBmobUser extends BmobUser {
     }
 
     public String getSignature() {
-        return signature == null ? "添加个人签名!" : signature;
+        return StringUtil.isEmpty(signature) ? "添加个人签名!" : signature;
     }
 
     public void setSignature(String signature) {

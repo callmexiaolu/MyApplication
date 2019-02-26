@@ -5,6 +5,10 @@
 
     <string name="btn_register">注册</string>
 
+    
+    <!-- 登录activity -->
+    <string name="et_user_name">用户名/邮箱/手机号</string>
+    <string name="et_user_password">密码</string>
     <string name="login_by_third">第三方登录</string>
     <string name="login_by_phone">免密登录</string>
     <string name="login_by_account">账号登陆</string>
@@ -12,15 +16,11 @@
     <string name="phone_verification_code">手机验证码</string>
     <string name="get_phone_verification_code">获取验证码</string>
     <string name="forget_password">忘记密码?</string>
-
     <string name="we_chat">微信</string>
-
     <string name="qq">QQ</string>
 
-    <string name="et_user_name">用户名/邮箱/手机号</string>
-
-    <string name="et_user_password">密码</string>
-
+   
+    <!--MainActivity -->
     <string name="rbtn_1">首页</string>
 
     <string name="rbtn_2">关注</string>
@@ -29,15 +29,34 @@
 
     <string name="rbtn_4">我</string>
 
+    <!-- fragment4 -->
     <string name="tv_fragment4_login_registered">登录/注册</string>
     <string name="tv_fragment4_introduction">添加个人签名</string>
-
     <string name="follow_string">关注</string>
     <string name="fans_string">粉丝</string>
     <string name="thumb_up_string">获赞</string>
     <string name="post_string">帖子</string>
-
     <string name="collection">我的收藏</string>
     <string name="app_about">产品关于</string>
     <string name="app_setting">应用设置</string>
+    
+    <!-- SettingsActivity -->
+    <string name="settings_name">设置</string>
+    <string name="settings_push">推送通知</string>
+    <string name="settings_night_mode">夜间模式</string>
+    <string name="settings_clear_cache">清除缓存</string>
+    <string name="settings_version">版本</string>
+    <string name="settings_login_out">退出登录</string>
+    <string name="settings_introduction">GBook(Green Book)是一款致力于为用户提供二手书交易平台，
+                                        并且提供失物寻找等功能的社区APP，开发者为广东药科大学信息管理与信息系统专业的一名学生。</string>
+    
+    
+    <!-- PublicPostActivity -->
+    <string name="public_activity_title">发帖</string>
+    <string name="public_done">发布</string>
+    <string name="public_add_title">添加标题</string>
+    <string name="public_add_content">添加内容描述(5个字以上)</string>
+    <string name="public_add_category">发布到哪个板块(选择正确板块有利于曝光)</string>
+
+    
 </resources>
