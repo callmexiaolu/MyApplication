@@ -17,6 +17,7 @@ import com.example.myapplication.service.IDone;
 import com.example.myapplication.service.PublicPostService;
 import com.example.myapplication.service.PublicPostServiceImpl;
 import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.FileUtils;
 import com.example.myapplication.util.GifSizeFilter;
 import com.example.myapplication.util.Glide4Engine;
 import com.zhihu.matisse.Matisse;
@@ -127,8 +128,15 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         String title = mEtPublicTitle.getText().toString();
         String content = mEtPublicContent.getText().toString();
         String price = mEtPublicPrice.getText().toString();
-        String category = mTvPublicCategory.getText().toString();
-        mPostService.publicPost(title, content, price, category, mSelected, new IDone() {
+        String category = "二手书";
+        List<String> picturesPath = new ArrayList<>();
+        if (mSelected != null) {
+            for (int i = 0; i < mSelected.size(); i++) {
+                picturesPath.add(FileUtils.getRealFilePath(this, mSelected.get(i)));
+            }
+        }
+        Log.d(Contast.TAG, ""+picturesPath);
+        mPostService.publicPost(title, content, price, category, picturesPath, new IDone() {
             @Override
             public void done() {
                 PublicPostActivity.this.finish();

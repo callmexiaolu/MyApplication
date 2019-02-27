@@ -27,34 +27,22 @@ public class PublicPostServiceImpl implements PublicPostService {
      * @param content 帖子内容
      * @param price 物品价格
      * @param category 帖子种类
-     * @param picturesFileUri 帖子图片本地路径 可为null(即不添加图片)
+     * @param picturesFilePath 帖子图片本地路径 可为null(即不添加图片)
      * @param done 回调接口,发表成功后可以直接关闭界面
      */
     @Override
     public void publicPost(final String title, final String content,
                            final String price, final String category,
-                           final List<Uri> picturesFileUri, final IDone done) {
+                           final List<String> picturesFilePath, final IDone done) {
         if (!StringUtil.isEmptyContainsSpace(title) &&
                 !StringUtil.isEmptyContainsSpace(content) &&
                 !StringUtil.isEmptyContainsSpace(price) &&
                 !StringUtil.isEmpty(category)) {
             if (BmobUser.isLogin()) {
-                Book book = new Book(title, content, Double.valueOf(price.trim()), category);
-                picturesUpload(picturesFileUri);
-               // book.setPicturesUrl();
-                book.setAuthor(BmobUser.getCurrentUser(MyBmobUser.class));
-                book.save(new SaveListener<String>() {
+                picturesUpload(picturesFilePath, new PublicPostService.IUploadDone() {
                     @Override
-                    public void done(String s, BmobException e) {
-                        if (e == null) {
-                            ToastUtil.showToast(MyApplication.getAppContext(), "发表成功", true);
-                            if (done != null) {
-                                done.done();
-                            }
-                        } else {
-                            Log.e(Contast.TAG, "public post has error:" + e);
-                            ToastUtil.showToast(MyApplication.getAppContext(), "出错了,稍后再试!", true);
-                        }
+                    public void uploadSucceed(List<String> picturesUrls) {
+                        savePostInfo(title, content, price, category, picturesUrls, done);
                     }
                 });
             }
@@ -70,16 +58,21 @@ public class PublicPostServiceImpl implements PublicPostService {
      *  list为上传文件 BmobFile类型
      *  list1为文件的服务器地址 String类型
      *  ******
-     * @param picturesFileUri 照片的uri
+     * @param picturesFilePath 照片的uri
      * @return
      */
     @Override
-    public void picturesUpload(List<Uri> picturesFileUri) {
-        if (picturesFileUri != null && picturesFileUri.size() > 0) {
-            BmobFile.uploadBatch((String[]) picturesFileUri.toArray(), new UploadBatchListener() {
+    public void picturesUpload(List<String> picturesFilePath, final PublicPostService.IUploadDone uploadDone) {
+        if (picturesFilePath != null && picturesFilePath.size() > 0) {
+            String[] urls = new String[picturesFilePath.size()];
+            for (int i = 0; i < picturesFilePath.size(); i++) {
+                urls[i] = picturesFilePath.get(i);
+            }
+            BmobFile.uploadBatch(urls, new UploadBatchListener() {
                 @Override
                 public void onSuccess(List<BmobFile> list, List<String> list1) {
                     //需要把list1取出来，赋值给帖子中的图片链接list
+                    uploadDone.uploadSucceed(list1);
                     Log.d(Contast.TAG, "成功");
                 }
 
@@ -103,4 +96,34 @@ public class PublicPostServiceImpl implements PublicPostService {
         }
     }
 
+    /**
+     * 保存用户帖子信息到服务器
+     * @param title
+     * @param content
+     * @param price
+     * @param category
+     * @param picturesUrls
+     * @param done
+     */
+    private void savePostInfo(final String title, final String content,
+                              final String price, final String category,
+                              final List<String> picturesUrls, final IDone done) {
+        Book book = new Book(title, content, Double.valueOf(price.trim()), category);
+        book.setAuthor(BmobUser.getCurrentUser(MyBmobUser.class));
+        book.setPicturesUrl(picturesUrls);
+        book.save(new SaveListener<String>() {
+            @Override
+            public void done(String s, BmobException e) {
+                if (e == null) {
+                    ToastUtil.showToast(MyApplication.getAppContext(), "发表成功", true);
+                    if (done != null) {
+                        done.done();
+                    }
+                } else {
+                    Log.e(Contast.TAG, "public post has error:" + e);
+                    ToastUtil.showToast(MyApplication.getAppContext(), "出错了,稍后再试!", true);
+                }
+            }
+        });
+    }
 }
