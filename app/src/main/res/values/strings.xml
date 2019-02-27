@@ -54,9 +54,13 @@
     <!-- PublicPostActivity -->
     <string name="public_activity_title">发帖</string>
     <string name="public_done">发布</string>
-    <string name="public_add_title">添加标题</string>
-    <string name="public_add_content">添加内容描述(5个字以上)</string>
+    <string name="public_add_title">添加标题 品类品牌型号</string>
+    <string name="public_add_content">添加内容描述(转手原因,购入渠道,使用感受等)</string>
     <string name="public_add_category">发布到哪个板块(选择正确板块有利于曝光)</string>
+    <string name="public_price">价格￥:</string>
+    <string name="public_transaction_way">交易方式</string>
+    <string name="public_transaction_school">交易方式:校内面交</string>
 
+    <string name="error_gif"></string>
     
 </resources>

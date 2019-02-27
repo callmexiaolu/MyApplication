@@ -1,5 +1,7 @@
 package com.example.myapplication.bean;
 
+import java.util.List;
+
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.datatype.BmobRelation;
@@ -9,22 +11,27 @@ import cn.bmob.v3.datatype.BmobRelation;
  */
 public class Post extends BmobObject {
 
-    private String describe;//帖子描述
+    private String content;//帖子内容
     private String title;//标题
     private BmobFile cover;//封面图片
     private Integer lookCount;//帖子浏览量
-    private User author;//发帖人
+    private Integer thumbUp;//帖子点赞数
+    private BmobRelation thumbUpRelation;//点赞关联--关联到哪些用户点赞
+    private Integer collect;//帖子收藏数
+    private BmobRelation collectRelation;//收藏关联-关联到哪些用户收藏
+    private MyBmobUser author;//发帖人
     private BmobRelation relation;//关联， 该帖子关联哪个用户
+    private String category;//帖子种类
+    private List<String> picturesUrl;//帖子照片链接
 
     //帖子中发帖人的头像务必从user中头像读取，避免user更新头像，发帖人头像不更新
-    //可以在Bmob后端云数据库中设置9张图片，第一张图片为帖子封面，用户最多选择九张图片，保存对应图片到对应的数据中
 
-    public String getDescribe() {
-        return describe;
+    public String getContent() {
+        return content;
     }
 
-    public void setDescribe(String describe) {
-        this.describe = describe;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getTitle() {
@@ -43,11 +50,11 @@ public class Post extends BmobObject {
         this.cover = cover;
     }
 
-    public User getAuthor() {
+    public MyBmobUser getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(MyBmobUser author) {
         this.author = author;
     }
 
@@ -65,5 +72,53 @@ public class Post extends BmobObject {
 
     public void setLookCount(Integer lookCount) {
         this.lookCount = lookCount;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public List<String> getPicturesUrl() {
+        return picturesUrl;
+    }
+
+    public void setPicturesUrl(List<String> picturesUrl) {
+        this.picturesUrl = picturesUrl;
+    }
+
+    public Integer getThumbUp() {
+        return thumbUp;
+    }
+
+    public void setThumbUp(Integer thumbUp) {
+        this.thumbUp = thumbUp;
+    }
+
+    public Integer getCollect() {
+        return collect;
+    }
+
+    public void setCollect(Integer collect) {
+        this.collect = collect;
+    }
+
+    public BmobRelation getThumbUpRelation() {
+        return thumbUpRelation;
+    }
+
+    public void setThumbUpRelation(BmobRelation thumbUpRelation) {
+        this.thumbUpRelation = thumbUpRelation;
+    }
+
+    public BmobRelation getCollectRelation() {
+        return collectRelation;
+    }
+
+    public void setCollectRelation(BmobRelation collectRelation) {
+        this.collectRelation = collectRelation;
     }
 }

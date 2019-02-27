@@ -15,6 +15,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- 允许读取手机状态 用于创建BmobInstallation -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!--相机权限-->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!--读取SD卡的权限:打开相册选取图片所必须的权限-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".MyApplication"
@@ -39,7 +43,19 @@
             android:name="cn.bmob.v3.util.BmobContentProvider"
             android:authorities="com.example.myapplication.BmobContentProvider" />
 
+        <!-- 用于知乎的图片选择库中的拍照功能 -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.myapplication.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
         <activity android:name=".activity.SettingsActivity"></activity>
+        <activity android:name=".activity.PublicPostActivity"></activity>
     </application>
 
 </manifest>

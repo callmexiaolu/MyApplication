@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.example.myapplication.MyApplication;
-import com.example.myapplication.activity.MainActivity;
 import com.example.myapplication.bean.MyBmobUser;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.SharedUil;
@@ -22,16 +21,16 @@ import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 
-public class LoginServiceImpl extends LoginService {
+public class LoginServiceImpl implements LoginService {
 
     /**
      * 用户登录
      * @param name 用户名字：可以是邮箱，手机号，邮箱任意一个
      * @param password
-     * @param activity
+     * @param done 接口回调关闭activity或者跳转
      */
     @Override
-    public void userLogin(final String name, final String password, final Activity activity) {
+    public void userLogin(final String name, final String password, final IDone done) {
         //此处对密码进行加密操作,然后从服务器读取加密后的密码进行对比
         if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(password)) {
             final String encryptPassword = StringUtil.encryptPassword(password);
@@ -42,9 +41,10 @@ public class LoginServiceImpl extends LoginService {
                         //登录成功
                         SharedUil.saveString(Contast.SHARED_USER_NAME_KEY, name);
                         SharedUil.saveString(Contast.SHARED_USER_PASSWORD_KEY, encryptPassword);
-                        activity.startActivity(new Intent(activity, MainActivity.class));
-                        activity.finish();
                         ToastUtil.showToast(MyApplication.getAppContext(), "登录成功", true);
+                        if (done != null) {
+                            done.done();
+                        }
                     } else {
                         //登录失败
                         Log.d(Contast.TAG, "" + e);
@@ -65,10 +65,10 @@ public class LoginServiceImpl extends LoginService {
      * 用户注册
      * @param name 用户名
      * @param password 密码
-     * @param activity
+     * @param done
      */
     @Override
-    public void userSignByName(final String name, final String password, final Activity activity) {
+    public void userSignByName(final String name, final String password, final IDone done) {
         if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(password)) {
             final String encryptPassword = StringUtil.encryptPassword(password);
             MyBmobUser bmobUser = new MyBmobUser();
@@ -79,8 +79,9 @@ public class LoginServiceImpl extends LoginService {
                 public void done(MyBmobUser myBmobUser, BmobException e) {
                     if (e == null) {
                         ToastUtil.showToast(MyApplication.getAppContext(), "注册成功!正在登录", true);
-                        activity.startActivity(new Intent(activity, MainActivity.class));
-                        activity.finish();
+                        if (done != null) {
+                            done.done();
+                        }
                     } else {
                         ToastUtil.showToast(MyApplication.getAppContext(), "出错了，请稍后重试", true);
                     }
@@ -95,10 +96,10 @@ public class LoginServiceImpl extends LoginService {
      * 通过手机一键登录或者注册
      * @param phoneNum
      * @param smsCode 验证码
-     * @param activity
+     * @param done
      */
     @Override
-    public void userLoginOrSignByPhone(String phoneNum, String smsCode, final Activity activity) {
+    public void userLoginOrSignByPhone(String phoneNum, String smsCode, final IDone done) {
         if (!StringUtil.isEmpty(phoneNum) && !StringUtil.isEmpty(smsCode)) {
             MyBmobUser user = new MyBmobUser();
             user.setMobilePhoneNumber(phoneNum);
@@ -108,8 +109,9 @@ public class LoginServiceImpl extends LoginService {
                 @Override
                 public void done(MyBmobUser myBmobUser, BmobException e) {
                     if (e == null) {
-                        activity.startActivity(new Intent(activity, MainActivity.class));
-                        activity.finish();
+                        if (done != null) {
+                            done.done();
+                        }
                     } else {
                         ToastUtil.showToast(MyApplication.getAppContext(), "验证码或手机号码出错，请稍后重试", true);
                     }

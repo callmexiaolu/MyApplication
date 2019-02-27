@@ -1,69 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <RelativeLayout
-        style="@style/settings_item">
-
-        <ImageView
-            android:id="@+id/iv_public_cancel"
-            style="@style/fragment4_iv_left"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_action_cancel"
-            />
-
-        <TextView
-            style="@style/settings_tv1"
-            android:layout_centerInParent="true"
-            android:text="@string/public_activity_title"/>
-
-        <TextView
-            android:id="@+id/tv_public_done"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
-            android:textColor="@color/login_area"
-            android:text="@string/public_done" />
-    </RelativeLayout>
-
-    <View
-        android:background="@color/fragment1_line_color"
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp" />
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_gravity="top"
         android:orientation="vertical">
 
-        <TextView
+        <RelativeLayout
+            style="@style/settings_item">
+
+            <ImageView
+                android:id="@+id/iv_public_cancel"
+                style="@style/fragment4_iv_left"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_action_cancel"
+                />
+
+            <TextView
+                style="@style/settings_tv1"
+                android:layout_centerInParent="true"
+                android:text="@string/public_activity_title"/>
+
+            <TextView
+                android:id="@+id/tv_public_done"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:textColor="@color/login_area"
+                android:text="@string/public_done" />
+        </RelativeLayout>
+
+        <View
+            android:background="@color/fragment1_line_color"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:hint="@string/public_add_title"/>
+            android:layout_height="0.5dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/et_public_title"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:background="@null"
+                style="?android:attr/textViewStyle"
+                android:hint="@string/public_add_title"/>
 
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:gravity="center_vertical"
-            android:hint="@string/public_add_content"/>
+            <EditText
+                android:id="@+id/et_public_content"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:gravity="center_vertical"
+                android:background="@null"
+                style="?android:attr/textViewStyle"
+                android:hint="@string/public_add_content"/>
+
+            <EditText
+                android:id="@+id/et_public_price"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:inputType="numberDecimal"
+                android:gravity="center_vertical"
+                android:background="@null"
+                android:hint="@string/public_price"
+                style="?android:attr/textViewStyle"/>
+
+            <TextView
+                android:id="@+id/tv_public_transaction_way"
+                android:text="@string/public_transaction_school"
+                android:gravity="center_vertical"
+                android:textColor="@color/font_color"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tv_public_switch_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/public_add_category"
+            android:layout_margin="10dp"/>
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/iv_public_add_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_action_add_picture"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp" />
+
+    </RelativeLayout>
+
+</FrameLayout>
+

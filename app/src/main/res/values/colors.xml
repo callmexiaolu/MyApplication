@@ -9,7 +9,7 @@
     <color name="black">#000000</color>
     <!-- 透明色-->
     <color name="transparent">#00000000</color>
-    <color name="search_view_color">#d5ed4a4a</color>
+    <color name="search_view_color">#ed4a4a</color>
     
     <color name="fragment4_background">#11fcfcfc</color>
 

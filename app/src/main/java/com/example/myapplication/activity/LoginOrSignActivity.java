@@ -1,5 +1,6 @@
 package com.example.myapplication.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
+import com.example.myapplication.service.IDone;
 import com.example.myapplication.service.LoginService;
 import com.example.myapplication.service.LoginServiceImpl;
 import com.example.myapplication.util.StringUtil;
@@ -134,14 +136,24 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
             case R.id.btn_user_sure_login://确定登录
                 if (CURRENT_LOGIN_MODE) {
                     //使用账号密码登录
-                    mLoginService.userLogin(mEtUserAccount.getText().toString(), mEtUserPassword.getText().toString(), this);
+                    mLoginService.userLogin(mEtUserAccount.getText().toString(), mEtUserPassword.getText().toString(), new IDone() {
+                        @Override
+                        public void done() {
+                            LoginOrSignActivity.this.startActivity(new Intent(LoginOrSignActivity.this, MainActivity.class));
+                        }
+                    });
                 } else {
                     //免密登录
                     if (!StringUtil.isEmpty(mEtUserPhoneCode.getText().toString())) {
                         mLoginService.userLoginOrSignByPhone(
                                 mEtUserPhoneNumber.getText().toString(),
                                 mEtUserPhoneCode.getText().toString(),
-                                this);
+                                new IDone() {
+                                    @Override
+                                    public void done() {
+                                        LoginOrSignActivity.this.startActivity(new Intent(LoginOrSignActivity.this, MainActivity.class));
+                                    }
+                                });
                     } else {
                         ToastUtil.showToast(this, "验证码不能为空", true);
                     }

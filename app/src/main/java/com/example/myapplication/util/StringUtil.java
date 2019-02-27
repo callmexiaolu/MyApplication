@@ -45,7 +45,7 @@ public class StringUtil {
     }
 
     /**
-     * 字符串检测：非空,不能为非法字符"null"
+     * 字符串检测：非空,不能为非法字符"null"，不能包含空格
      * @param string
      * @return
      */
@@ -57,5 +57,16 @@ public class StringUtil {
         return false;
     }
 
-
+    /**
+     * 字符串检测：非空,不能为非法字符"null",但可以包含空格
+     * @param string
+     * @return
+     */
+    public static boolean isEmptyContainsSpace(String string) {
+        if (string == null || string.trim().length() == 0 ||
+                string.trim().equalsIgnoreCase("null")) {
+            return true;
+        }
+        return false;
+    }
 }
