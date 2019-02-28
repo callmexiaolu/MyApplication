@@ -20,4 +20,8 @@ public class Contast {
 
     /**Shared 保存的用户头像本地路径 key*/
     public static final String SHARED_USER_AVATAR_KEY = "avatarPath";
+
+    /** 发帖时，选择照片最大数量 */
+    public static final int MAX_SELECTED_NUMBER = 9;
+
 }

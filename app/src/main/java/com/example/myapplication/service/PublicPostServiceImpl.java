@@ -1,6 +1,5 @@
 package com.example.myapplication.service;
 
-import android.net.Uri;
 import android.util.Log;
 
 import com.example.myapplication.MyApplication;
@@ -10,6 +9,7 @@ import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
+import java.io.File;
 import java.util.List;
 
 import cn.bmob.v3.BmobUser;
@@ -33,16 +33,30 @@ public class PublicPostServiceImpl implements PublicPostService {
     @Override
     public void publicPost(final String title, final String content,
                            final String price, final String category,
-                           final List<String> picturesFilePath, final IDone done) {
+                           final List<String> picturesFilePath, final IDoCallBack done) {
         if (!StringUtil.isEmptyContainsSpace(title) &&
                 !StringUtil.isEmptyContainsSpace(content) &&
                 !StringUtil.isEmptyContainsSpace(price) &&
                 !StringUtil.isEmpty(category)) {
             if (BmobUser.isLogin()) {
-                picturesUpload(picturesFilePath, new PublicPostService.IUploadDone() {
+                if (picturesFilePath == null || picturesFilePath.size() == 0)  {
+                    savePostInfo(title, content, price, category, null, done);
+                    return;
+                }
+                picturesUpload(picturesFilePath, new IUploadPost() {
                     @Override
                     public void uploadSucceed(List<String> picturesUrls) {
                         savePostInfo(title, content, price, category, picturesUrls, done);
+                    }
+
+                    @Override
+                    public void uploading() {
+                        done.doing();
+                    }
+
+                    @Override
+                    public void uploadFailed() {
+                        done.doFailed();
                     }
                 });
             }
@@ -58,21 +72,21 @@ public class PublicPostServiceImpl implements PublicPostService {
      *  list为上传文件 BmobFile类型
      *  list1为文件的服务器地址 String类型
      *  ******
-     * @param picturesFilePath 照片的uri
+     * @param picturesFilePath 照片的绝对路径(这里的照片经过了压缩)
      * @return
      */
     @Override
-    public void picturesUpload(List<String> picturesFilePath, final PublicPostService.IUploadDone uploadDone) {
+    public void picturesUpload(List<String> picturesFilePath, final IUploadPost upload) {
         if (picturesFilePath != null && picturesFilePath.size() > 0) {
-            String[] urls = new String[picturesFilePath.size()];
+            String[] paths = new String[picturesFilePath.size()];
             for (int i = 0; i < picturesFilePath.size(); i++) {
-                urls[i] = picturesFilePath.get(i);
+                paths[i] = picturesFilePath.get(i);
             }
-            BmobFile.uploadBatch(urls, new UploadBatchListener() {
+            BmobFile.uploadBatch(paths, new UploadBatchListener() {
                 @Override
                 public void onSuccess(List<BmobFile> list, List<String> list1) {
                     //需要把list1取出来，赋值给帖子中的图片链接list
-                    uploadDone.uploadSucceed(list1);
+                    upload.uploadSucceed(list1);
                     Log.d(Contast.TAG, "成功");
                 }
 
@@ -85,12 +99,13 @@ public class PublicPostServiceImpl implements PublicPostService {
                  */
                 @Override
                 public void onProgress(int i, int i1, int i2, int i3) {
-
+                    upload.uploading();
                 }
 
                 @Override
                 public void onError(int i, String s) {
-                    Log.d(Contast.TAG, "帖子照片上传失败:"+ s);
+                    upload.uploadFailed();
+                    Log.e(Contast.TAG, "帖子照片上传失败:"+ s);
                 }
             });
         }
@@ -107,7 +122,7 @@ public class PublicPostServiceImpl implements PublicPostService {
      */
     private void savePostInfo(final String title, final String content,
                               final String price, final String category,
-                              final List<String> picturesUrls, final IDone done) {
+                              final List<String> picturesUrls, final IDoCallBack done) {
         Book book = new Book(title, content, Double.valueOf(price.trim()), category);
         book.setAuthor(BmobUser.getCurrentUser(MyBmobUser.class));
         book.setPicturesUrl(picturesUrls);
@@ -115,13 +130,12 @@ public class PublicPostServiceImpl implements PublicPostService {
             @Override
             public void done(String s, BmobException e) {
                 if (e == null) {
-                    ToastUtil.showToast(MyApplication.getAppContext(), "发表成功", true);
                     if (done != null) {
                         done.done();
                     }
                 } else {
-                    Log.e(Contast.TAG, "public post has error:" + e);
-                    ToastUtil.showToast(MyApplication.getAppContext(), "出错了,稍后再试!", true);
+                    done.doFailed();
+                    Log.e(Contast.TAG, "save post info has error:" + e);
                 }
             }
         });

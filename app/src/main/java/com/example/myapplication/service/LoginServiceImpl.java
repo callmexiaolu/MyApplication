@@ -1,7 +1,5 @@
 package com.example.myapplication.service;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.util.Log;
 
 import com.example.myapplication.MyApplication;
@@ -30,7 +28,7 @@ public class LoginServiceImpl implements LoginService {
      * @param done 接口回调关闭activity或者跳转
      */
     @Override
-    public void userLogin(final String name, final String password, final IDone done) {
+    public void userLogin(final String name, final String password, final IDoCallBack done) {
         //此处对密码进行加密操作,然后从服务器读取加密后的密码进行对比
         if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(password)) {
             final String encryptPassword = StringUtil.encryptPassword(password);
@@ -51,7 +49,9 @@ public class LoginServiceImpl implements LoginService {
                         if (e.getErrorCode() == 101) {
                             ToastUtil.showToast(MyApplication.getAppContext(), "用户名或密码错误", true);
                         } else {
-                            ToastUtil.showToast(MyApplication.getAppContext(), "出错了，请稍后再试", true);
+                            if (done != null) {
+                                done.doFailed();
+                            }
                         }
                     }
                 }
@@ -68,7 +68,7 @@ public class LoginServiceImpl implements LoginService {
      * @param done
      */
     @Override
-    public void userSignByName(final String name, final String password, final IDone done) {
+    public void userSignByName(final String name, final String password, final IDoCallBack done) {
         if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(password)) {
             final String encryptPassword = StringUtil.encryptPassword(password);
             MyBmobUser bmobUser = new MyBmobUser();
@@ -99,7 +99,7 @@ public class LoginServiceImpl implements LoginService {
      * @param done
      */
     @Override
-    public void userLoginOrSignByPhone(String phoneNum, String smsCode, final IDone done) {
+    public void userLoginOrSignByPhone(String phoneNum, String smsCode, final IDoCallBack done) {
         if (!StringUtil.isEmpty(phoneNum) && !StringUtil.isEmpty(smsCode)) {
             MyBmobUser user = new MyBmobUser();
             user.setMobilePhoneNumber(phoneNum);
@@ -113,7 +113,9 @@ public class LoginServiceImpl implements LoginService {
                             done.done();
                         }
                     } else {
-                        ToastUtil.showToast(MyApplication.getAppContext(), "验证码或手机号码出错，请稍后重试", true);
+                        if (done != null) {
+                            done.doFailed();
+                        }
                     }
                 }
             });

@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.service.IDone;
+import com.example.myapplication.service.IDoCallBack;
 import com.example.myapplication.service.LoginService;
 import com.example.myapplication.service.LoginServiceImpl;
 import com.example.myapplication.util.StringUtil;
@@ -136,26 +136,19 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
             case R.id.btn_user_sure_login://确定登录
                 if (CURRENT_LOGIN_MODE) {
                     //使用账号密码登录
-                    mLoginService.userLogin(mEtUserAccount.getText().toString(), mEtUserPassword.getText().toString(), new IDone() {
-                        @Override
-                        public void done() {
-                            LoginOrSignActivity.this.startActivity(new Intent(LoginOrSignActivity.this, MainActivity.class));
-                        }
-                    });
+                    mLoginService.userLogin(
+                            mEtUserAccount.getText().toString(),
+                            mEtUserPassword.getText().toString(),
+                            loginCallBack);
                 } else {
                     //免密登录
                     if (!StringUtil.isEmpty(mEtUserPhoneCode.getText().toString())) {
-                        mLoginService.userLoginOrSignByPhone(
-                                mEtUserPhoneNumber.getText().toString(),
+                        mLoginService.userLoginOrSignByPhone
+                                (mEtUserPhoneNumber.getText().toString(),
                                 mEtUserPhoneCode.getText().toString(),
-                                new IDone() {
-                                    @Override
-                                    public void done() {
-                                        LoginOrSignActivity.this.startActivity(new Intent(LoginOrSignActivity.this, MainActivity.class));
-                                    }
-                                });
+                                loginCallBack);
                     } else {
-                        ToastUtil.showToast(this, "验证码不能为空", true);
+                        ToastUtil.showToast(this, "手机号码和验证码不能为空", true);
                     }
                 }
                 break;
@@ -198,4 +191,21 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
         mTvUserGetPhoneCode.setFocusable(false);
         return true;
     }
+
+    private IDoCallBack loginCallBack = new IDoCallBack() {
+        @Override
+        public void done() {
+            LoginOrSignActivity.this.startActivity(new Intent(LoginOrSignActivity.this, MainActivity.class));
+        }
+
+        @Override
+        public void doing() {
+
+        }
+
+        @Override
+        public void doFailed() {
+            ToastUtil.showToast(LoginOrSignActivity.this, "登录失败", true);
+        }
+    };
 }

@@ -13,7 +13,7 @@ public interface LoginService {
      * @param name     用户名字：可以是邮箱，手机号，邮箱任意一个
      * @param password
      */
-    void userLogin(final String name, final String password, IDone done);
+    void userLogin(final String name, final String password, IDoCallBack done);
 
     /**
      * 用户注册，用户名，密码注册
@@ -22,7 +22,7 @@ public interface LoginService {
      * @param password
      * @return
      */
-    void userSignByName(final String name, final String password, IDone done);
+    void userSignByName(final String name, final String password, IDoCallBack done);
 
     /**
      * 用户手机号免密登录
@@ -32,7 +32,7 @@ public interface LoginService {
      * @param smsCode  验证码
      * @return
      */
-    void userLoginOrSignByPhone(final String phoneNum, final String smsCode, IDone done);
+    void userLoginOrSignByPhone(final String phoneNum, final String smsCode, IDoCallBack done);
 
 
     /**

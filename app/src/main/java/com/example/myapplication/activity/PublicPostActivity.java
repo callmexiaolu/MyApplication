@@ -6,28 +6,36 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
-import com.example.myapplication.service.IDone;
+import com.example.myapplication.adapter.MyGridViewAdapter;
+import com.example.myapplication.service.IDoCallBack;
 import com.example.myapplication.service.PublicPostService;
 import com.example.myapplication.service.PublicPostServiceImpl;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.FileUtils;
 import com.example.myapplication.util.GifSizeFilter;
 import com.example.myapplication.util.Glide4Engine;
+import com.example.myapplication.util.ToastUtil;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
+import com.zxy.tiny.Tiny;
+import com.zxy.tiny.callback.FileBatchCallback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 
 /**
  * Create By LuKaiqi 2019/02/26
@@ -37,7 +45,7 @@ import java.util.List;
  *              *发布到哪个板块
  *              *图片
  */
-public class PublicPostActivity extends BaseActivity implements View.OnClickListener {
+public class PublicPostActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
 
     private static final int REQUEST_CODE_CHOOSE = 1;
 
@@ -50,6 +58,12 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
     private TextView mTvPublicDone, mTvPublicCategory;
 
     private ImageView mIvPublicCancel, mIvPublicPicture;
+
+    private String[] mPicturesPaths;
+
+    private GridView mGvSelectedPictures;
+
+    private MyGridViewAdapter mGridViewAdapter;
 
     @Override
     public int setRootLayoutId() {
@@ -67,6 +81,8 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
         mIvPublicCancel = findViewById(R.id.iv_public_cancel);
         mIvPublicPicture = findViewById(R.id.iv_public_add_picture);
+
+        mGvSelectedPictures = findViewById(R.id.gv_public_show_selected);
     }
 
     @Override
@@ -91,6 +107,9 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         mIvPublicPicture.setFocusable(true);
         mIvPublicPicture.setClickable(true);
         mIvPublicPicture.setOnClickListener(this);
+
+        mGvSelectedPictures.setOnItemClickListener(this);
+        mGvSelectedPictures.setOnItemLongClickListener(this);
     }
 
     @Override
@@ -113,7 +132,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
                         .countable(true)
                         .capture(true)
                         .captureStrategy(new CaptureStrategy(true, "com.example.myapplication.fileprovider"))
-                        .maxSelectable(9)
+                        .maxSelectable(Contast.MAX_SELECTED_NUMBER)
                         .addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
                         .gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
                         .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
@@ -124,24 +143,31 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    /**
+     * 帖子添加内容完成，点击发布
+     */
     private void publicDone() {
-        String title = mEtPublicTitle.getText().toString();
-        String content = mEtPublicContent.getText().toString();
-        String price = mEtPublicPrice.getText().toString();
-        String category = "二手书";
-        List<String> picturesPath = new ArrayList<>();
+        final String title = mEtPublicTitle.getText().toString();
+        final String content = mEtPublicContent.getText().toString();
+        final String price = mEtPublicPrice.getText().toString();
+        final String category = "二手书";
+        //图片压缩
         if (mSelected != null) {
-            for (int i = 0; i < mSelected.size(); i++) {
-                picturesPath.add(FileUtils.getRealFilePath(this, mSelected.get(i)));
-            }
+            Tiny.FileCompressOptions options = new Tiny.FileCompressOptions();
+            Tiny.getInstance().source(mPicturesPaths).batchAsFile().withOptions(options).batchCompress(new FileBatchCallback() {
+                @Override
+                public void callback(boolean isSuccess, String[] outfiles, Throwable t) {
+                    if (isSuccess) {
+                        mPostService.publicPost(title, content, price, category, Arrays.asList(outfiles), mCallBack);
+                        return;
+                    }
+                    ToastUtil.showToast(PublicPostActivity.this, "压缩图片失败,使用原始图片发帖", true);
+                    mPostService.publicPost(title, content, price, category, Arrays.asList(mPicturesPaths), mCallBack);
+                }
+            });
+            return;
         }
-        Log.d(Contast.TAG, ""+picturesPath);
-        mPostService.publicPost(title, content, price, category, picturesPath, new IDone() {
-            @Override
-            public void done() {
-                PublicPostActivity.this.finish();
-            }
-        });
+        mPostService.publicPost(title, content, price, category, null, mCallBack);
     }
 
     @Override
@@ -149,7 +175,46 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
             mSelected = Matisse.obtainResult(data);
+            //图片uri转换为path
+            mPicturesPaths = new String[mSelected.size()];
+            for (int i = 0; i < mSelected.size(); i++) {
+                mPicturesPaths[i] = FileUtils.getRealFilePath(PublicPostActivity.this, mSelected.get(i));
+            }
             Log.d(Contast.TAG, "PublicPostActivity mSelected done" + mSelected);
         }
     }
+
+    private void initGridView() {
+
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        return false;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    //帖子发布回调接口
+    private IDoCallBack mCallBack = new IDoCallBack() {
+        @Override
+        public void done() {
+            ToastUtil.showToast(PublicPostActivity.this, "发表成功", true);
+            PublicPostActivity.this.finish();
+        }
+
+        @Override
+        public void doing() {
+
+        }
+
+        @Override
+        public void doFailed() {
+            ToastUtil.showToast(PublicPostActivity.this, "帖子发布失败", true);
+        }
+    };
+
 }

@@ -7,6 +7,7 @@ import com.example.myapplication.db.DBConfig;
 import com.example.myapplication.db.UserTable;
 import com.example.myapplication.dbutil.TableOperate;
 import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.FileUtils;
 import com.example.myapplication.util.SharedUil;
 
 import cn.bmob.v3.Bmob;

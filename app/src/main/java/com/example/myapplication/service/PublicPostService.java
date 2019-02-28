@@ -1,7 +1,5 @@
 package com.example.myapplication.service;
 
-import android.net.Uri;
-
 import java.util.List;
 
 /**
@@ -24,24 +22,34 @@ public interface PublicPostService {
                     String price,
                     String category,
                     List<String> picturesFilePath,
-                    IDone done);
+                    IDoCallBack done);
 
     /**
      * 上传帖子照片到后台，返回照片的链接
-     * @param picturesFilePath 照片的uri
+     * @param picturesFilePath 照片的路径
      * @param uploadDone 帖子照片上传成功回调
      * @return 照片的链接集合
      */
-    void picturesUpload(List<String> picturesFilePath, IUploadDone uploadDone);
+    void picturesUpload(List<String> picturesFilePath, IUploadPost uploadDone);
 
     /**
-     * 帖子上传成功回调接口
+     * 帖子上传回调接口
      */
-    interface IUploadDone{
+    interface IUploadPost {
         /**
          * 照片上传回调
          * @param picturesUrls 照片上传成功后，在服务器的url
          */
         void uploadSucceed(List<String> picturesUrls);
+
+        /**
+         * 上传中
+         */
+        void uploading();
+
+        /**
+         * 上传失败
+         */
+        void uploadFailed();
     }
 }

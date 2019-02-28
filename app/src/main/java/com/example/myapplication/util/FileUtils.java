@@ -12,6 +12,8 @@ import android.provider.MediaStore;
 
 import java.io.File;
 
+import static android.os.Environment.MEDIA_MOUNTED;
+
 /**
  * Create by LuKaiqi on 2019/2/27.
  * function:
