@@ -1,18 +1,26 @@
 package com.example.myapplication.activity;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.myapplication.MyApplication;
@@ -55,15 +63,17 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
     private EditText mEtPublicTitle, mEtPublicContent, mEtPublicPrice;
 
-    private TextView mTvPublicDone, mTvPublicCategory;
+    private TextView mTvPublicDone, mTvPublicCategory, mTvProgress;
 
     private ImageView mIvPublicCancel, mIvPublicPicture;
 
-    private String[] mPicturesPaths;
+    private String[] mPicturesPaths;//已选择照片的地址合集
 
-    private GridView mGvSelectedPictures;
+    private GridView mGvSelectedPictures;//展示已选择照片
 
     private MyGridViewAdapter mGridViewAdapter;
+
+    private ProgressBar mPbProgress;//进度条
 
     @Override
     public int setRootLayoutId() {
@@ -120,6 +130,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
                 break;
 
             case R.id.tv_public_switch_category://选择帖子发布的板块
+                switchPostCategory();
                 break;
 
             case R.id.iv_public_cancel://取消发布
@@ -140,6 +151,9 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
                         .imageEngine(new Glide4Engine())
                         .forResult(REQUEST_CODE_CHOOSE);
                 break;
+
+            default:
+                break;
         }
     }
 
@@ -150,7 +164,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         final String title = mEtPublicTitle.getText().toString();
         final String content = mEtPublicContent.getText().toString();
         final String price = mEtPublicPrice.getText().toString();
-        final String category = "二手书";
+        final String category = mTvPublicCategory.getText().toString();
         //图片压缩
         if (mSelected != null) {
             Tiny.FileCompressOptions options = new Tiny.FileCompressOptions();
@@ -158,11 +172,12 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void callback(boolean isSuccess, String[] outfiles, Throwable t) {
                     if (isSuccess) {
-                        mPostService.publicPost(title, content, price, category, Arrays.asList(outfiles), mCallBack);
+                        Log.d(Contast.TAG, "调用了图片压缩回调");
+                        mPostService.publicPost(title, content, price, category, outfiles, mCallBack);
                         return;
                     }
                     ToastUtil.showToast(PublicPostActivity.this, "压缩图片失败,使用原始图片发帖", true);
-                    mPostService.publicPost(title, content, price, category, Arrays.asList(mPicturesPaths), mCallBack);
+                    mPostService.publicPost(title, content, price, category, mPicturesPaths, mCallBack);
                 }
             });
             return;
@@ -170,27 +185,75 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         mPostService.publicPost(title, content, price, category, null, mCallBack);
     }
 
+    /**
+     * 用户发布帖子时选择照片后,相应数据会回调到该方法
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
-            mSelected = Matisse.obtainResult(data);
-            //图片uri转换为path
-            mPicturesPaths = new String[mSelected.size()];
-            for (int i = 0; i < mSelected.size(); i++) {
-                mPicturesPaths[i] = FileUtils.getRealFilePath(PublicPostActivity.this, mSelected.get(i));
+            try {
+                mSelected = Matisse.obtainResult(data);
+                //图片uri转换为path
+                mPicturesPaths = new String[mSelected.size()];
+                for (int i = 0; i < mSelected.size(); i++) {
+                    mPicturesPaths[i] = FileUtils.getRealFilePath(PublicPostActivity.this, mSelected.get(i));
+                }
+                //展示所选择的照片
+                showSelectedPostPictures(mSelected);
+                Log.d(Contast.TAG, "PublicPostActivity mSelected done" + mSelected);
+            } catch (Exception e) {
+                Log.e(Contast.TAG, "选择图片回调出错：" + e);
             }
-            Log.d(Contast.TAG, "PublicPostActivity mSelected done" + mSelected);
         }
     }
 
-    private void initGridView() {
+    /**
+     * 选择帖子发布板块
+     */
+    private void switchPostCategory() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("选择发布板块")
+                .setSingleChoiceItems(Contast.POST_CATERGORY, -1, new DialogInterface.OnClickListener() {
 
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mTvPublicCategory.setText(Contast.POST_CATERGORY[which]);
+                        dialog.dismiss();
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    /**
+     * 展示帖子选择的照片
+     * @param selected
+     */
+    private void showSelectedPostPictures(List<Uri> selected) {
+        mGridViewAdapter = new MyGridViewAdapter(this, selected);
+        mGvSelectedPictures.setAdapter(mGridViewAdapter);
+        mGridViewAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        return false;
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("删除照片")
+                .setNegativeButton("取消", null)
+                .setPositiveButton("删除", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSelected.remove(position);
+                        mGridViewAdapter.notifyDataSetChanged();
+                    }
+                })
+                .setMessage("确认删除？")
+                .create();
+        dialog.show();
+        return true;
     }
 
     @Override
@@ -198,17 +261,42 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
     }
 
+    private Dialog mDialog;
+
     //帖子发布回调接口
     private IDoCallBack mCallBack = new IDoCallBack() {
         @Override
         public void done() {
+            if (mDialog != null) {
+                mDialog.dismiss();
+            }
             ToastUtil.showToast(PublicPostActivity.this, "发表成功", true);
             PublicPostActivity.this.finish();
         }
 
         @Override
-        public void doing() {
-
+        public void doing(int totalProgress) {
+            if (mDialog == null) {
+                mDialog = new Dialog(PublicPostActivity.this);
+                mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);//去除标题栏
+                LayoutInflater inflater = LayoutInflater.from(PublicPostActivity.this);
+                View dialogView = inflater.inflate(R.layout.dialog_progress_bar, null);
+                mPbProgress = dialogView.findViewById(R.id.pb_progress);
+                mTvProgress = dialogView.findViewById(R.id.tv_progress);
+                mDialog.setContentView(dialogView);//填充弹窗布局为自定义布局
+                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                Window window = mDialog.getWindow();
+                layoutParams.copyFrom(window.getAttributes());
+                layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+                layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                //注意要在Dialog show之后，再将宽高属性设置进去，才有效果
+                mDialog.show();
+                window.setAttributes(layoutParams);
+                mDialog.setCancelable(false);//点击其它地方，弹窗不会消失
+            }
+            String progressText = String.valueOf(totalProgress) + "%";
+            mPbProgress.setProgress(totalProgress);
+            mTvProgress.setText(progressText);
         }
 
         @Override

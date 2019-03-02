@@ -14,6 +14,7 @@ import com.example.myapplication.adapter.MyViewPagerAdapter;
 import com.example.myapplication.fragment.indexFragment.BookFragment;
 import com.example.myapplication.fragment.indexFragment.FindFragment;
 import com.example.myapplication.fragment.indexFragment.LostFragment;
+import com.example.myapplication.util.Contast;
 import com.example.myapplication.widget.ViewPagerIndicator;
 
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener {
 
     private ViewPager mViewPagerHome;
 
-    private String[] mFragmentTitles = new String[]{"二手书", "失物招领", "物品找回"};
 
     private List<Fragment> mFragmentList;
     private FragmentManager mFragmentManager;
@@ -59,7 +59,7 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener {
         mFragmentList.add(new BookFragment());
         mFragmentList.add(new LostFragment());
         mFragmentList.add(new FindFragment());
-        mAdapter.setData(mFragmentList, mFragmentTitles);
+        mAdapter.setData(mFragmentList, Contast.POST_CATERGORY);
         mViewPagerHome.setAdapter(mAdapter);
         mViewPagerHome.setOffscreenPageLimit(4);
         mPagerIndicatorHome.setViewPager(mViewPagerHome);

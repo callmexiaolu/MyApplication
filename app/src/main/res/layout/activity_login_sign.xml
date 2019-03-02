@@ -48,6 +48,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -63,6 +64,7 @@
 
                 <LinearLayout
                     android:id="@+id/ll_user_login_with_account"
+                    android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
@@ -79,6 +81,7 @@
                     android:id="@+id/ll_user_login_without_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="15dp"
                     android:orientation="vertical"
@@ -98,7 +101,7 @@
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="15dp"
                     android:layout_marginRight="15dp"
-                    android:background="@drawable/fragment_login_btn"
+                    android:background="@drawable/btn_login"
                     android:text="@string/btn_login"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -138,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                android:background="@drawable/ll_third"
+                android:background="@drawable/ll_login_sign"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -160,7 +163,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                android:background="@drawable/ll_third"
+                android:background="@drawable/ll_login_sign"
                 android:orientation="horizontal">
 
 

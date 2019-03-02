@@ -33,13 +33,13 @@ public class PublicPostServiceImpl implements PublicPostService {
     @Override
     public void publicPost(final String title, final String content,
                            final String price, final String category,
-                           final List<String> picturesFilePath, final IDoCallBack done) {
+                           final String[] picturesFilePath, final IDoCallBack done) {
         if (!StringUtil.isEmptyContainsSpace(title) &&
                 !StringUtil.isEmptyContainsSpace(content) &&
                 !StringUtil.isEmptyContainsSpace(price) &&
                 !StringUtil.isEmpty(category)) {
             if (BmobUser.isLogin()) {
-                if (picturesFilePath == null || picturesFilePath.size() == 0)  {
+                if (picturesFilePath == null || picturesFilePath.length == 0)  {
                     savePostInfo(title, content, price, category, null, done);
                     return;
                 }
@@ -50,8 +50,8 @@ public class PublicPostServiceImpl implements PublicPostService {
                     }
 
                     @Override
-                    public void uploading() {
-                        done.doing();
+                    public void uploading(int position, int currentProgress, int total, int totalProgress) {
+                        done.doing(totalProgress);
                     }
 
                     @Override
@@ -76,18 +76,18 @@ public class PublicPostServiceImpl implements PublicPostService {
      * @return
      */
     @Override
-    public void picturesUpload(List<String> picturesFilePath, final IUploadPost upload) {
-        if (picturesFilePath != null && picturesFilePath.size() > 0) {
-            String[] paths = new String[picturesFilePath.size()];
-            for (int i = 0; i < picturesFilePath.size(); i++) {
-                paths[i] = picturesFilePath.get(i);
-            }
-            BmobFile.uploadBatch(paths, new UploadBatchListener() {
+    public void picturesUpload(final String[] picturesFilePath, final IUploadPost upload) {
+        if (picturesFilePath != null && picturesFilePath.length > 0) {
+            BmobFile.uploadBatch(picturesFilePath, new UploadBatchListener() {
                 @Override
                 public void onSuccess(List<BmobFile> list, List<String> list1) {
                     //需要把list1取出来，赋值给帖子中的图片链接list
-                    upload.uploadSucceed(list1);
-                    Log.d(Contast.TAG, "成功");
+                    //因为每上传成功一张图片就会回调一次，并且传过来的list1数据是上传成功的url合集
+                    //所以这里判断一下是否全部上传完，上传完之后再保存数据
+                    if (list1.size() == picturesFilePath.length) {
+                        upload.uploadSucceed(list1);
+                        Log.d(Contast.TAG, "图片批量上传成功");
+                    }
                 }
 
                 /**
@@ -99,7 +99,8 @@ public class PublicPostServiceImpl implements PublicPostService {
                  */
                 @Override
                 public void onProgress(int i, int i1, int i2, int i3) {
-                    upload.uploading();
+                    upload.uploading(i, i1, i2, i3);
+                    Log.d(Contast.TAG, "上传第" + i + "张图片,当前进度:" + i1 + "%,当前上传总图片数为:" + i2 + ",总进度:" + i3 + "%");
                 }
 
                 @Override

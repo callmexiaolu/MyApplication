@@ -24,4 +24,7 @@ public class Contast {
     /** 发帖时，选择照片最大数量 */
     public static final int MAX_SELECTED_NUMBER = 9;
 
+    /** 帖子类别 */
+    public static final String[] POST_CATERGORY = new String[]{"二手书", "失物招领", "物品找回"};
+
 }

@@ -199,7 +199,7 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
         }
 
         @Override
-        public void doing() {
+        public void doing(int totalProgress) {
 
         }
 

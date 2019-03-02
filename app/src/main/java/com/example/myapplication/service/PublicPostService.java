@@ -21,7 +21,7 @@ public interface PublicPostService {
                     String content,
                     String price,
                     String category,
-                    List<String> picturesFilePath,
+                    String[] picturesFilePath,
                     IDoCallBack done);
 
     /**
@@ -30,7 +30,7 @@ public interface PublicPostService {
      * @param uploadDone 帖子照片上传成功回调
      * @return 照片的链接集合
      */
-    void picturesUpload(List<String> picturesFilePath, IUploadPost uploadDone);
+    void picturesUpload(String[] picturesFilePath, IUploadPost uploadDone);
 
     /**
      * 帖子上传回调接口
@@ -43,9 +43,15 @@ public interface PublicPostService {
         void uploadSucceed(List<String> picturesUrls);
 
         /**
-         * 上传中
+         *
+         *                  *上传进度
+         *                   @param position 当前上传的文件下标
+         *                   @param currentProgress 当前上传文件的上传进度
+         *                   @param total 总的上传文件数
+         *                   @param totalProgress 总进度
+         *
          */
-        void uploading();
+        void uploading(int position, int currentProgress, int total, int totalProgress);
 
         /**
          * 上传失败

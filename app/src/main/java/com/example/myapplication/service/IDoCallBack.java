@@ -14,8 +14,9 @@ public interface IDoCallBack {
     /**
      * activity任务进行中回调方法
      * (这里可以在activity进行任务中实现一个加载等待的动画)
+     * @param totalProgress 进度
      */
-    void doing();
+    void doing(int totalProgress);
 
 
     /**
