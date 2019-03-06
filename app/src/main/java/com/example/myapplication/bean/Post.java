@@ -13,7 +13,6 @@ public class Post extends BmobObject {
 
     private String content;//帖子内容
     private String title;//标题
-    private BmobFile cover;//封面图片
     private Integer lookCount;//帖子浏览量
     private Integer thumbUp;//帖子点赞数
     private BmobRelation thumbUpRelation;//点赞关联--关联到哪些用户点赞
@@ -23,8 +22,30 @@ public class Post extends BmobObject {
     private BmobRelation relation;//关联， 该帖子关联哪个用户
     private String category;//帖子种类
     private List<String> picturesUrl;//帖子照片链接
+    private Double price;//书本价格
 
-    //帖子中发帖人的头像务必从user中头像读取，避免user更新头像，发帖人头像不更新
+    //帖子中发帖人的头像务必从user中头像读取，避免user更新头像，发帖人头像不更新。默认头像则从本地加载
+
+    public Post(String title, String content, Double price, String category) {
+        this.setTitle(title);
+        this.setContent(content);
+        this.setPrice(price);
+        this.setCategory(category);
+
+        this.setCollect(0);
+        this.setThumbUp(0);
+        this.setLookCount(0);
+
+    }
+
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
 
     public String getContent() {
         return content;
@@ -40,14 +61,6 @@ public class Post extends BmobObject {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public BmobFile getCover() {
-        return cover;
-    }
-
-    public void setCover(BmobFile cover) {
-        this.cover = cover;
     }
 
     public MyBmobUser getAuthor() {
@@ -67,7 +80,7 @@ public class Post extends BmobObject {
     }
 
     public Integer getLookCount() {
-        return lookCount;
+        return lookCount == null ? 0 : lookCount;
     }
 
     public void setLookCount(Integer lookCount) {
@@ -91,7 +104,7 @@ public class Post extends BmobObject {
     }
 
     public Integer getThumbUp() {
-        return thumbUp;
+        return thumbUp == null ? 0 : thumbUp;
     }
 
     public void setThumbUp(Integer thumbUp) {
@@ -99,7 +112,7 @@ public class Post extends BmobObject {
     }
 
     public Integer getCollect() {
-        return collect;
+        return collect == null ? 0 : collect;
     }
 
     public void setCollect(Integer collect) {

@@ -1,10 +1,12 @@
 package com.example.myapplication.service;
 
+import cn.bmob.v3.BmobUser;
+
 /**
  * Create By LuKaiqi 2019/02/25
  * Describe:登录，注册服务
  */
-public interface LoginService {
+public interface UserService {
 
 
     /**
@@ -16,7 +18,8 @@ public interface LoginService {
     void userLogin(final String name, final String password, IDoCallBack done);
 
     /**
-     * 用户注册，用户名，密码注册
+     * 用户注册
+     *         *用户名，密码注册
      *
      * @param name
      * @param password

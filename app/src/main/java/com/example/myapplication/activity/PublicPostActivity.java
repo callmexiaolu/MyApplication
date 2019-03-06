@@ -1,7 +1,6 @@
 package com.example.myapplication.activity;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -10,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +21,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.adapter.MyGridViewAdapter;
 import com.example.myapplication.service.IDoCallBack;
-import com.example.myapplication.service.PublicPostService;
-import com.example.myapplication.service.PublicPostServiceImpl;
+import com.example.myapplication.service.PostService;
+import com.example.myapplication.service.PostServiceImpl;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.FileUtils;
 import com.example.myapplication.util.GifSizeFilter;
@@ -41,8 +38,6 @@ import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import com.zxy.tiny.Tiny;
 import com.zxy.tiny.callback.FileBatchCallback;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -59,7 +54,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
     private List<Uri> mSelected = null;
 
-    private PublicPostService mPostService = new PublicPostServiceImpl();
+    private PostService mPostService = new PostServiceImpl();
 
     private EditText mEtPublicTitle, mEtPublicContent, mEtPublicPrice;
 

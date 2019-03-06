@@ -3,23 +3,30 @@ package com.example.myapplication.service;
 import android.util.Log;
 
 import com.example.myapplication.MyApplication;
-import com.example.myapplication.bean.Book;
 import com.example.myapplication.bean.MyBmobUser;
+import com.example.myapplication.bean.Post;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
-import java.io.File;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UploadBatchListener;
 
-
-public class PublicPostServiceImpl implements PublicPostService {
+/**
+ * Create By LuKaiqi
+ * Describe:
+ *          *帖子发布
+ *          *帖子获取
+ *          *帖子评论，点赞，收藏等
+ */
+public class PostServiceImpl implements PostService {
 
     /**
      * 发布帖子
@@ -43,7 +50,7 @@ public class PublicPostServiceImpl implements PublicPostService {
                     savePostInfo(title, content, price, category, null, done);
                     return;
                 }
-                picturesUpload(picturesFilePath, new IUploadPost() {
+                picturesUpload(picturesFilePath, new IUploadPostListener() {
                     @Override
                     public void uploadSucceed(List<String> picturesUrls) {
                         savePostInfo(title, content, price, category, picturesUrls, done);
@@ -76,7 +83,7 @@ public class PublicPostServiceImpl implements PublicPostService {
      * @return
      */
     @Override
-    public void picturesUpload(final String[] picturesFilePath, final IUploadPost upload) {
+    public void picturesUpload(final String[] picturesFilePath, final IUploadPostListener upload) {
         if (picturesFilePath != null && picturesFilePath.length > 0) {
             BmobFile.uploadBatch(picturesFilePath, new UploadBatchListener() {
                 @Override
@@ -113,6 +120,27 @@ public class PublicPostServiceImpl implements PublicPostService {
     }
 
     /**
+     * 从服务器中获取帖子数据
+     */
+    @Override
+    public void getPostDataFromServer(final IGetPostDataListener listener) {
+        BmobQuery<Post> bmobQuery = new BmobQuery<>();
+        bmobQuery.include("author");
+        bmobQuery.findObjects(new FindListener<Post>() {
+            @Override
+            public void done(List<Post> list, BmobException e) {
+                if (e == null) {
+                    listener.getSucceed(list);
+                    Log.d(Contast.TAG, "获取到帖子数据");
+                } else {
+                    listener.getFailed();
+                    Log.e(Contast.TAG, "BookFragment 刷新帖子异常:" + e);
+                }
+            }
+        });
+    }
+
+    /**
      * 保存用户帖子信息到服务器
      * @param title
      * @param content
@@ -124,10 +152,10 @@ public class PublicPostServiceImpl implements PublicPostService {
     private void savePostInfo(final String title, final String content,
                               final String price, final String category,
                               final List<String> picturesUrls, final IDoCallBack done) {
-        Book book = new Book(title, content, Double.valueOf(price.trim()), category);
-        book.setAuthor(BmobUser.getCurrentUser(MyBmobUser.class));
-        book.setPicturesUrl(picturesUrls);
-        book.save(new SaveListener<String>() {
+        Post post = new Post(title, content, Double.valueOf(price.trim()), category);
+        post.setAuthor(BmobUser.getCurrentUser(MyBmobUser.class));
+        post.setPicturesUrl(picturesUrls);
+        post.save(new SaveListener<String>() {
             @Override
             public void done(String s, BmobException e) {
                 if (e == null) {

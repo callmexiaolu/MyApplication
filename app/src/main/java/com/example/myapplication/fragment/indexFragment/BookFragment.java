@@ -9,11 +9,15 @@ import android.view.View;
 
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
-import com.example.myapplication.bean.Book;
+import com.example.myapplication.adapter.MyRecyclerViewAdapter;
+import com.example.myapplication.bean.Post;
 import com.example.myapplication.fragment.BaseFragment;
+import com.example.myapplication.service.PostService;
+import com.example.myapplication.service.PostServiceImpl;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.ToastUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
@@ -27,10 +31,13 @@ import cn.bmob.v3.listener.FindListener;
 public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView mRecyclerViewBook;
+    private MyRecyclerViewAdapter mAdapter;
 
     private SwipeRefreshLayout mSrlBook;
 
-    private List<Book> mBookList;
+    private List<Post> mBookList = new ArrayList<>();
+
+    private PostService postService = new PostServiceImpl();
 
     @Override
     public int setLayoutId() {
@@ -78,12 +85,29 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
      * 实现瀑布流布局
      */
     private void initRecyclerView() {
+        mAdapter = new MyRecyclerViewAdapter(getActivity(), mBookList);
         mRecyclerViewBook.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        //mRecyclerViewBook.setAdapter();
+        mRecyclerViewBook.setAdapter(mAdapter);
     }
 
     @Override
     public void onRefresh() {
+        //刷新获取帖子
+        postService.getPostDataFromServer(new PostService.IGetPostDataListener() {
+            @Override
+            public void getSucceed(List<Post> postList) {
+                int postUpdateCount = postList.size() - mBookList.size();
+                mBookList.clear();
+                mBookList.addAll(postList);
+                mAdapter.notifyDataSetChanged();
+                ToastUtil.showToast(MyApplication.getAppContext(), "本次更新帖子数:" + postUpdateCount, true);
+            }
 
+            @Override
+            public void getFailed() {
+                ToastUtil.showToast(MyApplication.getAppContext(), "刷新失败,稍后再试", true);
+            }
+        });
+        mSrlBook.setRefreshing(false);
     }
 }

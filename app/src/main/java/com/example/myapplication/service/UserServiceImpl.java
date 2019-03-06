@@ -19,7 +19,7 @@ import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 
-public class LoginServiceImpl implements LoginService {
+public class UserServiceImpl implements UserService {
 
     /**
      * 用户登录
@@ -185,4 +185,5 @@ public class LoginServiceImpl implements LoginService {
     public void userLoginByQQ() {
 
     }
+
 }

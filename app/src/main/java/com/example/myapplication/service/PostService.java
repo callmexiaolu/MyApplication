@@ -1,12 +1,19 @@
 package com.example.myapplication.service;
 
+import com.example.myapplication.bean.Post;
+
 import java.util.List;
 
 /**
  * Create By LuKaiqi 2019/02/27
- * Describe:用户发布帖子
+ * Describe:
+ *          *发布帖子 --- 两步:
+ *                          1.有图片描述，先把图片上传到服务器，得到对应图片的url
+ *                          2.帖子的图片url以及其它信息保存到服务器。
+ *          *获取帖子数据
+ *          *帖子评论，收藏，点赞等
  */
-public interface PublicPostService {
+public interface PostService {
 
     /**
      * 发布帖子
@@ -25,17 +32,22 @@ public interface PublicPostService {
                     IDoCallBack done);
 
     /**
-     * 上传帖子照片到后台，返回照片的链接
+     * 上传帖子照片到后台
      * @param picturesFilePath 照片的路径
      * @param uploadDone 帖子照片上传成功回调
-     * @return 照片的链接集合
      */
-    void picturesUpload(String[] picturesFilePath, IUploadPost uploadDone);
+    void picturesUpload(String[] picturesFilePath, IUploadPostListener uploadDone);
+
+    /**
+     * 从服务器中获取帖子数据
+     */
+    void getPostDataFromServer(IGetPostDataListener listener);
+
 
     /**
      * 帖子上传回调接口
      */
-    interface IUploadPost {
+    interface IUploadPostListener {
         /**
          * 照片上传回调
          * @param picturesUrls 照片上传成功后，在服务器的url
@@ -57,5 +69,15 @@ public interface PublicPostService {
          * 上传失败
          */
         void uploadFailed();
+    }
+
+    /**
+     * 从服务器获取帖子回调
+     */
+    interface IGetPostDataListener {
+
+        void getSucceed(List<Post> postList);
+
+        void getFailed();
     }
 }
