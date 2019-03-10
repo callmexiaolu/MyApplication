@@ -126,6 +126,7 @@ public class PostServiceImpl implements PostService {
     public void getPostDataFromServer(final IGetPostDataListener listener) {
         BmobQuery<Post> bmobQuery = new BmobQuery<>();
         bmobQuery.include("author");
+        bmobQuery.order("-updateAt");
         bmobQuery.findObjects(new FindListener<Post>() {
             @Override
             public void done(List<Post> list, BmobException e) {

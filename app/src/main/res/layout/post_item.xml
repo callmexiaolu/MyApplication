@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_margin="10dp"
+    android:layout_margin="5dp"
     android:background="@color/white">
 
     <LinearLayout
@@ -13,6 +13,8 @@
 
         <ImageView
             android:id="@+id/iv_browse_post_cover"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </ImageView>
@@ -20,7 +22,6 @@
         <RelativeLayout
             android:layout_gravity="bottom"
             android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
             android:layout_height="wrap_content">
 
             <TextView
@@ -30,7 +31,7 @@
                 android:maxLines="2"
                 android:textColor="@color/font_color"
                 android:textSize="16sp"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:text="阿迪达斯正品三叶草XL男款纯棉运动裤,保证新"/>
             
             <TextView
@@ -39,10 +40,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tv_browse_post_title"
                 android:text="￥100"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
+                android:maxLines="1"
                 android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textColor="@color/search_view_color" />
             
             <TextView
@@ -64,32 +66,21 @@
             <ImageView
                 android:id="@+id/iv_browse_post_user_avatar"
                 android:layout_below="@+id/line_browse_post"
-                android:layout_marginLeft="10dp"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_marginLeft="5dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/ic_action_we_chat"/>
 
             <TextView
                 android:id="@+id/tv_browse_post_user_name"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="5dp"
                 android:layout_below="@+id/line_browse_post"
                 android:layout_toRightOf="@+id/iv_browse_post_user_avatar"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="30dp"
                 android:text="15254832255841"
                 android:gravity="center_vertical"
                 android:textColor="@color/black"/>
-
-            <TextView
-                android:id="@+id/tv_browse_post_create_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_browse_post_user_name"
-                android:layout_alignParentRight="true"
-                android:gravity="center_vertical"
-                android:textSize="10sp"
-                android:text="发布于:2019-03-05 12:59:48"
-                />
 
         </RelativeLayout>
 

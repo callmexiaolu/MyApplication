@@ -16,12 +16,19 @@ import com.example.myapplication.R;
 import com.example.myapplication.activity.LoginOrSignActivity;
 import com.example.myapplication.activity.SettingsActivity;
 import com.example.myapplication.bean.MyBmobUser;
+import com.example.myapplication.bean.Post;
+import com.example.myapplication.service.UserService;
+import com.example.myapplication.service.UserServiceImpl;
 import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.NetWorkUtils;
 import com.example.myapplication.util.StringUtil;
 
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.CountListener;
 import cn.bmob.v3.listener.FetchUserInfoListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Create by LuKaiqi on 2019/2/17.
@@ -67,7 +74,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
 
     @Override
     public void initData() {
-        updateUserInfo();
+
     }
 
     @Override
@@ -106,21 +113,25 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onResume() {
+        updateUserInfo();
+        super.onResume();
+    }
+
     /**
      * 信息的获取会先从缓存中获取，因此应该进入页面即从后台获取最新数据更新缓存。
      * 更新本地缓存
+     *      **有网络时  从后台加载
+     *      **无网络时  从缓存加载
      */
-    private void updateUserInfo() {
+    private  void updateUserInfo() {
         if (BmobUser.isLogin()) {
-            BmobUser.fetchUserInfo(new FetchUserInfoListener<BmobUser>() {
-                @Override
-                public void done(BmobUser bmobUser, BmobException e) {
-                    if (e == null) {
-                        final MyBmobUser currentUser = BmobUser.getCurrentUser(MyBmobUser.class);
-                        loadUserInfo(currentUser);
-                    }
-                }
-            });
+            if (NetWorkUtils.isNetworkConnected()) {
+                UserService userService = new UserServiceImpl();
+                userService.userInfoUpdate();
+            }
+            loadUserInfo(BmobUser.getCurrentUser(MyBmobUser.class));
         } else {
             loadDefaultInfo();
         }

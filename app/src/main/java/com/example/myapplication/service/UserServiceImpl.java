@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.bean.MyBmobUser;
+import com.example.myapplication.bean.Post;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.SharedUil;
 import com.example.myapplication.util.StringUtil;
@@ -12,12 +13,19 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
+import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.CountListener;
+import cn.bmob.v3.listener.FetchUserInfoListener;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class UserServiceImpl implements UserService {
 
@@ -186,4 +194,42 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     * 用户信息更新
+     */
+    @Override
+    public void userInfoUpdate() {
+        //查询用户发帖数, 获赞数
+        BmobQuery<Post> query = new BmobQuery<>();
+        query.addWhereEqualTo("author",BmobUser.getCurrentUser(MyBmobUser.class));
+        query.findObjects(new FindListener<Post>() {
+            @Override
+            public void done(List<Post> list, BmobException e) {
+                MyBmobUser currentUser = BmobUser.getCurrentUser(MyBmobUser.class);
+                Log.d(Contast.TAG, "查询帖子数" + list.size());
+                currentUser.setPostCount(String.valueOf(list.size()));
+                int up = 0;
+                for (int i = 0; i < list.size(); i++) {
+                    up = up + list.get(i).getThumbUp();
+                }
+                currentUser.setThumbUp(String.valueOf(up));
+                currentUser.update(new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            Log.d(Contast.TAG, "done: " + "用户信息更新成功");
+                        }
+                    }
+                });
+            }
+        });
+        BmobUser.fetchUserInfo(new FetchUserInfoListener<BmobUser>() {
+            @Override
+            public void done(BmobUser bmobUser, BmobException e) {
+                if (e == null) {
+                    Log.d(Contast.TAG, "done: " + "用户缓存信息同步成功");
+                }
+            }
+        });
+    }
 }

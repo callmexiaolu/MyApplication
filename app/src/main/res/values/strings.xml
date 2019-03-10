@@ -61,6 +61,14 @@
     <string name="public_transaction_way">交易方式</string>
     <string name="public_transaction_school">交易方式:校内面交</string>
 
-    <string name="error_gif"></string>
+    <string name="error_gif">无法选择gif</string>
+
+    <!-- 帖子详情 -->
+    <string name="post_detail_collect">收藏</string>
+    <string name="post_detail_collect_cancel">取消收藏</string>
+    <string name="post_detail_thumb_up">点赞</string>
+    <string name="post_detail_thumb_cancel">取消赞</string>
+    <string name="post_detail_discuss">留言评论</string>
+    <string name="post_detail_business">咨询交易</string>
     
 </resources>

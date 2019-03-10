@@ -1,5 +1,6 @@
 package com.example.myapplication.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 import cn.bmob.v3.BmobObject;
@@ -9,7 +10,7 @@ import cn.bmob.v3.datatype.BmobRelation;
 /**
  * 帖子,基类
  */
-public class Post extends BmobObject {
+public class Post extends BmobObject implements Serializable {
 
     private String content;//帖子内容
     private String title;//标题
@@ -35,6 +36,10 @@ public class Post extends BmobObject {
         this.setCollect(0);
         this.setThumbUp(0);
         this.setLookCount(0);
+
+    }
+
+    public Post(){
 
     }
 

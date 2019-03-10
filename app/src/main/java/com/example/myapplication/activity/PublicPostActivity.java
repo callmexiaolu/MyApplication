@@ -121,6 +121,8 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_public_done://发布帖子
+                mTvPublicDone.setEnabled(false);
+                mCallBack.doing(0);
                 publicDone();
                 break;
 
@@ -265,6 +267,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
             if (mDialog != null) {
                 mDialog.dismiss();
             }
+            mTvPublicDone.setEnabled(true);
             ToastUtil.showToast(PublicPostActivity.this, "发表成功", true);
             PublicPostActivity.this.finish();
         }

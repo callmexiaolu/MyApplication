@@ -14,11 +14,11 @@
         <android.support.v7.widget.SearchView
             android:background="@color/white"
             android:layout_width="0dp"
-            android:layout_weight="7"
+            android:layout_weight="10"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginRight="10dp"
             android:layout_height="match_parent" />
 
         <ImageView

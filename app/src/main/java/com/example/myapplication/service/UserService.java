@@ -1,5 +1,7 @@
 package com.example.myapplication.service;
 
+import com.example.myapplication.bean.MyBmobUser;
+
 import cn.bmob.v3.BmobUser;
 
 /**
@@ -65,4 +67,8 @@ public interface UserService {
      */
     void userLoginByQQ();
 
+    /**
+     * 用户信息更新
+     */
+    void userInfoUpdate();
 }

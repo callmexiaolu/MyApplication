@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import com.example.myapplication.R;
@@ -18,6 +19,8 @@ import com.example.myapplication.fragment.Fragment1;
 import com.example.myapplication.fragment.Fragment2;
 import com.example.myapplication.fragment.Fragment3;
 import com.example.myapplication.fragment.Fragment4;
+import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,13 +175,18 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private long mExitTime = 0;
 
     /**
-     * 返回键，返回到桌面进入后台，而不是退出
+     * 返回键，连续两次返回退出应用
      */
     @Override
     public void onBackPressed() {
-        moveTaskToBack(true);
+        if (System.currentTimeMillis() - mExitTime > 2000) {
+            ToastUtil.showToast(this, "再按一次退出程序", true);
+            mExitTime = System.currentTimeMillis();
+        } else {
+            finish();
+        }
     }
-
 }

@@ -30,7 +30,9 @@
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.MainActivity">
+        <activity
+            android:name=".activity.MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,6 +58,7 @@
 
         <activity android:name=".activity.SettingsActivity"></activity>
         <activity android:name=".activity.PublicPostActivity"></activity>
+        <activity android:name=".activity.PostDetailActivity"></activity>
     </application>
 
 </manifest>

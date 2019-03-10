@@ -1,6 +1,8 @@
 package com.example.myapplication.fragment.indexFragment;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -9,6 +11,7 @@ import android.view.View;
 
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
+import com.example.myapplication.activity.PostDetailActivity;
 import com.example.myapplication.adapter.MyRecyclerViewAdapter;
 import com.example.myapplication.bean.Post;
 import com.example.myapplication.fragment.BaseFragment;
@@ -28,7 +31,8 @@ import cn.bmob.v3.listener.FindListener;
  * Create by LuKaiqi on 2019/2/17.
  * function:首页-二手书
  */
-public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
+                                                          MyRecyclerViewAdapter.OnItemClickListener {
 
     private RecyclerView mRecyclerViewBook;
     private MyRecyclerViewAdapter mAdapter;
@@ -59,7 +63,7 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
     @Override
     public void initListener() {
         mSrlBook.setOnRefreshListener(this);
-
+        mAdapter.setOnItemClickListener(this);
     }
 
     /**
@@ -90,6 +94,9 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
         mRecyclerViewBook.setAdapter(mAdapter);
     }
 
+    /**
+     * 用户下拉刷新
+     */
     @Override
     public void onRefresh() {
         //刷新获取帖子
@@ -97,9 +104,11 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
             @Override
             public void getSucceed(List<Post> postList) {
                 int postUpdateCount = postList.size() - mBookList.size();
-                mBookList.clear();
-                mBookList.addAll(postList);
-                mAdapter.notifyDataSetChanged();
+                if (postUpdateCount > 0) {
+                    mBookList.clear();
+                    mBookList.addAll(postList);
+                    mAdapter.notifyDataSetChanged();
+                }
                 ToastUtil.showToast(MyApplication.getAppContext(), "本次更新帖子数:" + postUpdateCount, true);
             }
 
@@ -110,4 +119,21 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
         });
         mSrlBook.setRefreshing(false);
     }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(PostDetailActivity.POST_ID, mBookList.get(position));
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemLongClick(View view, int position) {
+
+    }
+
+
+
 }

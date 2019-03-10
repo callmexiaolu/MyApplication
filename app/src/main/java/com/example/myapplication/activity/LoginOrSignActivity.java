@@ -15,6 +15,7 @@ import com.example.myapplication.R;
 import com.example.myapplication.service.IDoCallBack;
 import com.example.myapplication.service.UserService;
 import com.example.myapplication.service.UserServiceImpl;
+import com.example.myapplication.util.NetWorkUtils;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
@@ -208,7 +209,9 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
     private IDoCallBack loginCallBack = new IDoCallBack() {
         @Override
         public void done() {
-            LoginOrSignActivity.this.startActivity(new Intent(LoginOrSignActivity.this, MainActivity.class));
+            UserService userService = new UserServiceImpl();
+            userService.userInfoUpdate();
+            finish();
         }
 
         @Override
