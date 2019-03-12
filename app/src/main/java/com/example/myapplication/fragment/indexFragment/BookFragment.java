@@ -58,6 +58,7 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
     public void initData() {
         initSwipeRefreshLayout();
         initRecyclerView();
+        onRefresh();//进入该页面就刷新获取数据
     }
 
     @Override

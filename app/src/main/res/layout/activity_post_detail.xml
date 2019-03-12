@@ -13,6 +13,17 @@
         android:layout_margin="10dp"
         layout="@layout/include_back_to_fragment" />
 
+    <TextView
+        android:id="@+id/tv_post_detail_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="￥650"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/search_view_color"/>
+
     <ScrollView
         android:id="@+id/sv_post_detail_content"
         android:background="@color/white"
@@ -24,7 +35,6 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/ll_post_detail_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -73,24 +83,15 @@
             </RelativeLayout>
 
             <TextView
-                android:id="@+id/tv_post_detail_price"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:text="￥650"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/search_view_color"/>
-
-            <TextView
                 android:id="@+id/tv_post_detail_post_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textColor="@color/font_color"/>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_post_detail_post_pictures"
+            <LinearLayout
+                android:id="@+id/ll_post_detail_post_pictures"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

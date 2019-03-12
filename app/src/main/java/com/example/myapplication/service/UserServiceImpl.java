@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
             user.setMobilePhoneNumber(phoneNum);
             user.setUsername(phoneNum);
             user.setPassword(StringUtil.encryptPassword("666666"));
-            BmobUser.signOrLoginByMobilePhone(phoneNum, smsCode, new LogInListener<MyBmobUser>() {
+            user.signOrLogin(smsCode, new SaveListener<MyBmobUser>() {
                 @Override
                 public void done(MyBmobUser myBmobUser, BmobException e) {
                     if (e == null) {

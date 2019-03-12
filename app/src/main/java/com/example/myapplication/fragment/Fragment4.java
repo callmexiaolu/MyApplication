@@ -148,7 +148,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
      */
     private void loadUserInfo(MyBmobUser currentUser) {
         if (BmobUser.isLogin()) {
-            String avatarUrl = currentUser.getAvatarFile() == null ? "" : currentUser.getAvatarFile().getFileUrl();
+            String avatarUrl = currentUser.getAvatarFile() == null ? "" : currentUser.getAvatarFile();
             if (!StringUtil.isEmpty(avatarUrl)) {
                 Glide.with(MyApplication.getAppContext()).load(avatarUrl).into(mIvUserAvatar);
             } else {

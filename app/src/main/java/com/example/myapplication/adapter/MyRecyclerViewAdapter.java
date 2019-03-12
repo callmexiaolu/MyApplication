@@ -104,7 +104,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             if (post.getAuthor().getAvatarFile() == null) {
                 mIvPostUserAvatar.setImageResource(R.drawable.ic_action_me);
             } else {
-                Glide.with(context).load(post.getAuthor().getAvatarFile().getUrl()).into(mIvPostUserAvatar);
+                Glide.with(context).load(post.getAuthor().getAvatarFile()).into(mIvPostUserAvatar);
             }
             //设置帖子封面图片
             if (post.getPicturesUrl() != null) {

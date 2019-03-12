@@ -1,5 +1,7 @@
 package com.example.myapplication.bean;
 
+import android.support.annotation.Nullable;
+
 import com.example.myapplication.util.StringUtil;
 
 import cn.bmob.v3.BmobUser;
@@ -11,7 +13,7 @@ import cn.bmob.v3.datatype.BmobFile;
  */
 public class MyBmobUser extends BmobUser {
 
-    private BmobFile avatar;//用户头像
+    private String avatar;//用户头像url
 
     private String signature;//用户签名
 
@@ -63,12 +65,20 @@ public class MyBmobUser extends BmobUser {
         this.signature = signature;
     }
 
-    public BmobFile getAvatarFile() {
+    public String getAvatarFile() {
         return avatar;
     }
 
-    public void setAvatar(BmobFile avatarfile) {
+    public void setAvatar(String avatarfile) {
         this.avatar = avatarfile;
     }
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        MyBmobUser other = (MyBmobUser) obj;
+        return this.getObjectId().equals(other.getObjectId());
+    }
 }
