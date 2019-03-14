@@ -3,20 +3,27 @@ package com.example.myapplication.service;
 import android.util.Log;
 
 import com.example.myapplication.MyApplication;
+import com.example.myapplication.R;
+import com.example.myapplication.activity.PostDetailActivity;
+import com.example.myapplication.bean.Comment;
 import com.example.myapplication.bean.MyBmobUser;
 import com.example.myapplication.bean.Post;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.datatype.BmobPointer;
+import cn.bmob.v3.datatype.BmobRelation;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadBatchListener;
 
 /**
@@ -41,36 +48,22 @@ public class PostServiceImpl implements PostService {
     public void publicPost(final String title, final String content,
                            final String price, final String category,
                            final String[] picturesFilePath, final IDoCallBack done) {
-        if (!StringUtil.isEmptyContainsSpace(title) &&
-                !StringUtil.isEmptyContainsSpace(content) &&
-                !StringUtil.isEmptyContainsSpace(price) &&
-                !StringUtil.isEmpty(category)) {
-            if (BmobUser.isLogin()) {
-                if (picturesFilePath == null || picturesFilePath.length == 0)  {
-                    savePostInfo(title, content, price, category, null, done);
-                    return;
-                }
-                picturesUpload(picturesFilePath, new IUploadPostListener() {
-                    @Override
-                    public void uploadSucceed(List<String> picturesUrls) {
-                        savePostInfo(title, content, price, category, picturesUrls, done);
-                    }
-
-                    @Override
-                    public void uploading(int position, int currentProgress, int total, int totalProgress) {
-                        done.doing(totalProgress);
-                    }
-
-                    @Override
-                    public void uploadFailed() {
-                        done.doFailed();
-                    }
-                });
+        picturesUpload(picturesFilePath, new IUploadPostListener() {
+            @Override
+            public void uploadSucceed(List<String> picturesUrls) {
+                savePostInfo(title, content, price, category, picturesUrls, done);
             }
-        } else {
-            ToastUtil.showToast(MyApplication.getAppContext(), "内容和板块不能为空", true);
-        }
 
+            @Override
+            public void uploading(int position, int currentProgress, int total, int totalProgress) {
+                done.doing(totalProgress);
+            }
+
+            @Override
+            public void uploadFailed() {
+                done.doFailed();
+            }
+        });
     }
 
     /**
@@ -121,12 +114,14 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 从服务器中获取帖子数据
+     * @param category 帖子类型
      */
     @Override
-    public void getPostDataFromServer(final IGetPostDataListener listener) {
+    public void getPostDataFromServer(final IGetPostDataListener listener, String category) {
         BmobQuery<Post> bmobQuery = new BmobQuery<>();
         bmobQuery.include("author");
-        bmobQuery.order("-updateAt");
+        bmobQuery.addWhereEqualTo("category", category);
+        bmobQuery.order("-createdAt");
         bmobQuery.findObjects(new FindListener<Post>() {
             @Override
             public void done(List<Post> list, BmobException e) {
@@ -135,7 +130,7 @@ public class PostServiceImpl implements PostService {
                     Log.d(Contast.TAG, "获取到帖子数据");
                 } else {
                     listener.getFailed();
-                    Log.e(Contast.TAG, "BookFragment 刷新帖子异常:" + e);
+                    Log.e(Contast.TAG, "CategoryFragment 刷新帖子异常:" + e);
                 }
             }
         });
@@ -166,6 +161,135 @@ public class PostServiceImpl implements PostService {
                 } else {
                     done.doFailed();
                     Log.e(Contast.TAG, "save post info has error:" + e);
+                }
+            }
+        });
+    }
+
+    /**
+     * 发布评论
+     * @param postId 帖子id
+     * @param discussContent 评论内容
+     * @param user 评论用户
+     * @param actionListener 操作回调
+     */
+    @Override
+    public void publicDiscuss(String postId, String discussContent, MyBmobUser user, final IPostActionListener actionListener) {
+        Post post = new Post();
+        post.setObjectId(postId);
+        final Comment comment = new Comment();
+        comment.setContent(discussContent);
+        comment.setPost(post);
+        comment.setUser(user);
+        comment.save(new SaveListener<String>() {
+            @Override
+            public void done(String s, BmobException e) {
+                if (e == null) {
+                    List<String> result = new ArrayList<>();
+                    result.add(s);
+                    actionListener.doSucceed(PostDetailActivity.USER_ACTION_DISCUSS, result);
+                } else {
+                    actionListener.doFailed(PostDetailActivity.USER_ACTION_DISCUSS, e);
+                }
+            }
+        });
+    }
+
+    /**
+     * 帖子点赞,收藏状态检查
+     * @param mCurrentUser 当前用户
+     * @param postId 帖子id
+     * @param actionListener 帖子操作回调
+     */
+    @Override
+    public void postThumbUpCheck(final MyBmobUser mCurrentUser, String postId, final IPostActionListener actionListener) {
+        if (mCurrentUser != null) {
+            BmobQuery<MyBmobUser> query = new BmobQuery<>();
+            Post post = new Post();
+            post.setObjectId(postId);
+            query.addWhereRelatedTo("thumbUpRelation", new BmobPointer(post));
+            Log.d(Contast.TAG, "检查点赞收藏状态");
+            query.findObjects(new FindListener<MyBmobUser>() {
+                @Override
+                public void done(List<MyBmobUser> list, BmobException e) {
+                    if (e == null) {
+                        if (list.contains(mCurrentUser) ) {//用户点过了赞
+                            actionListener.doSucceed(PostDetailActivity.USER_ACTION_THUMBUP, list);
+                            Log.d(Contast.TAG, "用户点过了赞");
+                            Log.d(Contast.TAG, "检查点赞状态:" + "点赞用户数量:" + list.size() + "用户:" + list);
+                        }
+                    } else {
+                        actionListener.doFailed(PostDetailActivity.USER_ACTION_THUMBUP, e);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 帖子点赞
+     * @param mCurrentUser 当前用户
+     * @param bmobRelation 帖子点赞的用户列表
+     * @param post 帖子
+     * @param listener 帖子数据更新回调
+     */
+    @Override
+    public void postThumbUp(final MyBmobUser mCurrentUser,
+                            BmobRelation bmobRelation,
+                            Post post,
+                            final IPostActionListener listener) {
+        bmobRelation.add(mCurrentUser);
+        post.setThumbUpRelation(bmobRelation);
+        post.setThumbUp(post.getThumbUp() + 1);
+        Log.d(Contast.TAG, post.getThumbUp() + "");
+        post.update(new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+                if (e == null) {
+                    listener.doSucceed(PostDetailActivity.USER_ACTION_THUMBUP, null);
+                } else {
+                    listener.doFailed(PostDetailActivity.USER_ACTION_THUMBUP, e);
+                }
+            }
+        });
+    }
+
+    /**
+     * 帖子评论查询
+     * @param postId
+     * @param actionListener
+     */
+    @Override
+    public void postDiscussQuery(String postId, final IPostActionListener actionListener) {
+        BmobQuery<Comment> query = new BmobQuery<>();
+        Post post = new Post();
+        post.setObjectId(postId);
+        query.addWhereEqualTo("post", new BmobPointer(post));
+        query.include("user");
+        query.findObjects(new FindListener<Comment>() {
+            @Override
+            public void done(List<Comment> list, BmobException e) {
+                if (e == null) {
+                    actionListener.doSucceed(PostDetailActivity.USER_ACTION_QUERY_DISCUSS, list);
+                } else {
+                    actionListener.doFailed(PostDetailActivity.USER_ACTION_QUERY_DISCUSS, e);
+                }
+            }
+        });
+    }
+
+    /**
+     * 更新帖子信息
+     */
+    @Override
+    public void postUpdate(final Post post) {
+        post.update(new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+                if (e == null) {
+                    Log.d(Contast.TAG, "帖子浏览量+1，当前该帖子浏览量:" + post.getLookCount());
+                } else {
+                    Log.e(Contast.TAG, "设置帖子浏览量异常:", e);
                 }
             }
         });

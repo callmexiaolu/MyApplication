@@ -6,23 +6,15 @@ package com.example.myapplication.adapter;
  */
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.bean.Post;
 
@@ -43,7 +35,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, viewGroup, false);
+        View view;
+        view = LayoutInflater.from(mContext).inflate(R.layout.rv_fragment1_post_item_2, viewGroup, false);
         return new MyViewHolder(view);
     }
 
@@ -82,7 +75,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView mTvPostTitle, mTvPostPrice, mTvPostCollect, mTvPostUserName;
+        private TextView mTvPostTitle, mTvPostPrice, mTvPostLookCount, mTvPostUserName;
         private ImageView mIvPostUserAvatar;
         private ImageView mIvPostCover;
 
@@ -90,7 +83,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             super(itemView);
             mTvPostTitle = itemView.findViewById(R.id.tv_browse_post_title);
             mTvPostPrice = itemView.findViewById(R.id.tv_browse_post_price);
-            mTvPostCollect = itemView.findViewById(R.id.tv_browse_post_collect);
+            mTvPostLookCount = itemView.findViewById(R.id.tv_browse_post_look);
             mTvPostUserName = itemView.findViewById(R.id.tv_browse_post_user_name);
             mIvPostUserAvatar = itemView.findViewById(R.id.iv_browse_post_user_avatar);
             mIvPostCover = itemView.findViewById(R.id.iv_browse_post_cover);
@@ -98,8 +91,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
         public void setPostInfo(Post post, Context context) {
             mTvPostTitle.setText(post.getTitle());
-            mTvPostPrice.setText("￥" + String.valueOf(post.getPrice()));
-            mTvPostCollect.setText(String.valueOf(post.getCollect()) + "收藏");
+            mTvPostPrice.setText("¥" + String.valueOf(post.getPrice()));
+            mTvPostLookCount.setText(String.valueOf(post.getLookCount()));
             mTvPostUserName.setText(post.getAuthor().getUsername());
             if (post.getAuthor().getAvatarFile() == null) {
                 mIvPostUserAvatar.setImageResource(R.drawable.ic_action_me);

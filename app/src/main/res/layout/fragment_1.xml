@@ -12,6 +12,7 @@
         android:background="@color/search_view_color">
 
         <android.support.v7.widget.SearchView
+            android:id="@+id/search_view_fragment1"
             android:background="@color/white"
             android:layout_width="0dp"
             android:layout_weight="10"
@@ -36,8 +37,17 @@
     <com.example.myapplication.widget.ViewPagerIndicator
         android:id="@+id/vpi_home"
         android:layout_below="@+id/ll_search_and_add_post"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="30dp" />
+
+    <CheckBox
+        android:id="@+id/cb_fragment1_choose_layout"
+        android:button="@null"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/ll_search_and_add_post"
+        android:background="@drawable/btn_choose_layout"/>
 
     <View
         android:layout_below="@+id/vpi_home"

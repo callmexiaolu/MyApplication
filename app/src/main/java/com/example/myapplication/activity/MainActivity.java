@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -30,6 +31,9 @@ import java.util.List;
  * Describe:主界面
  */
 public class MainActivity extends BaseActivity {
+
+    //用于在fragment之间传递信息
+    private Handler mHandler;
 
     private List<Fragment> mFragments;
     private RadioGroup mRadioGroup;
@@ -85,6 +89,10 @@ public class MainActivity extends BaseActivity {
     @Override
     public void initListener() {
         mRadioGroup.setOnCheckedChangeListener(mCheckedChangeListener);
+    }
+
+    public void setHandler(Handler handler) {
+        this.mHandler = handler;
     }
 
     private void setDefaultFragment() {

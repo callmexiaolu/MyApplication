@@ -21,6 +21,7 @@
 
         <RelativeLayout
             android:layout_gravity="bottom"
+            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -30,7 +31,6 @@
                 android:layout_height="wrap_content"
                 android:maxLines="2"
                 android:textColor="@color/font_color"
-                android:textSize="16sp"
                 android:layout_margin="5dp"
                 android:text="阿迪达斯正品三叶草XL男款纯棉运动裤,保证新"/>
             
@@ -46,40 +46,47 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="@color/search_view_color" />
-            
-            <TextView
-                android:id="@+id/tv_browse_post_collect"
+
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="right"
+                android:layout_toLeftOf="@id/tv_browse_post_look"
+                android:layout_below="@id/tv_browse_post_title"
+                android:src="@drawable/ic_action_look"/>
+            
+            <TextView
+                android:id="@+id/tv_browse_post_look"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/tv_browse_post_title"
-                android:text="10人收藏"/>
+                android:text="10人浏览"/>
 
             <View
                 android:id="@+id/line_browse_post"
                 android:layout_below="@+id/tv_browse_post_price"
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
+                android:layout_marginTop="5dp"
                 android:background="@color/fragment1_line_color" />
 
             <ImageView
                 android:id="@+id/iv_browse_post_user_avatar"
                 android:layout_below="@+id/line_browse_post"
-                android:layout_marginLeft="5dp"
+                android:layout_margin="5dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/ic_action_we_chat"/>
 
             <TextView
                 android:id="@+id/tv_browse_post_user_name"
-                android:layout_marginLeft="5dp"
+                android:layout_margin="5dp"
                 android:layout_below="@+id/line_browse_post"
                 android:layout_toRightOf="@+id/iv_browse_post_user_avatar"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:text="15254832255841"
-                android:gravity="center_vertical"
+                android:gravity="center"
                 android:textColor="@color/black"/>
 
         </RelativeLayout>

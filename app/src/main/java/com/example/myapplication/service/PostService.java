@@ -1,8 +1,14 @@
 package com.example.myapplication.service;
 
+import com.example.myapplication.bean.MyBmobUser;
 import com.example.myapplication.bean.Post;
 
 import java.util.List;
+
+import cn.bmob.v3.datatype.BmobRelation;
+import cn.bmob.v3.listener.UpdateListener;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Create By LuKaiqi 2019/02/27
@@ -41,7 +47,40 @@ public interface PostService {
     /**
      * 从服务器中获取帖子数据
      */
-    void getPostDataFromServer(IGetPostDataListener listener);
+    void getPostDataFromServer(IGetPostDataListener listener, String category);
+
+    /**
+     * 帖子评论
+     * @param postId 帖子id
+     * @param discussContent 评论内容
+     * @param user 评论用户
+     * @param actionListener 操作回调
+     */
+    void publicDiscuss(String postId, String discussContent, MyBmobUser user, IPostActionListener actionListener);
+
+    /**
+     * 帖子点赞状态检查
+     */
+    void postThumbUpCheck(final MyBmobUser mCurrentUser, String postId, final IPostActionListener actionListener);
+
+    /**
+     * 帖子点赞
+     */
+    void postThumbUp(final MyBmobUser mCurrentUser,
+                     BmobRelation bmobRelation,
+                     Post post,
+                     IPostActionListener listener);
+
+
+    /**
+     * 帖子评论查询
+     */
+    void postDiscussQuery(String postId, IPostActionListener actionListener);
+
+    /**
+     * 帖子信息更新
+     */
+    void postUpdate(Post post);
 
 
     /**
@@ -79,5 +118,19 @@ public interface PostService {
         void getSucceed(List<Post> postList);
 
         void getFailed();
+    }
+
+    /**
+     * 帖子操作回调
+     *        *评论
+     *        *点赞
+     *        *收藏
+     */
+    interface IPostActionListener{
+
+        void doSucceed(int actionType, List<? extends Object> list);
+
+        void doFailed(int actionType, Exception e);
+
     }
 }

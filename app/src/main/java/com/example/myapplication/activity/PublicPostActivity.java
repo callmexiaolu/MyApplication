@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.adapter.MyGridViewAdapter;
 import com.example.myapplication.service.IDoCallBack;
@@ -30,6 +31,7 @@ import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.FileUtils;
 import com.example.myapplication.util.GifSizeFilter;
 import com.example.myapplication.util.Glide4Engine;
+import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
@@ -121,8 +123,6 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_public_done://发布帖子
-                mTvPublicDone.setEnabled(false);
-                mCallBack.doing(0);
                 publicDone();
                 break;
 
@@ -162,24 +162,33 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         final String content = mEtPublicContent.getText().toString();
         final String price = mEtPublicPrice.getText().toString();
         final String category = mTvPublicCategory.getText().toString();
-        //图片压缩
-        if (mSelected != null) {
-            Tiny.FileCompressOptions options = new Tiny.FileCompressOptions();
-            Tiny.getInstance().source(mPicturesPaths).batchAsFile().withOptions(options).batchCompress(new FileBatchCallback() {
-                @Override
-                public void callback(boolean isSuccess, String[] outfiles, Throwable t) {
-                    if (isSuccess) {
-                        Log.d(Contast.TAG, "调用了图片压缩回调");
-                        mPostService.publicPost(title, content, price, category, outfiles, mCallBack);
-                        return;
+        if (!StringUtil.isEmptyContainsSpace(title) &&
+                !StringUtil.isEmptyContainsSpace(content) &&
+                !StringUtil.isEmptyContainsSpace(price) &&
+                !StringUtil.isEmpty(category)) {
+            //图片压缩
+            if (mSelected != null) {
+                mTvPublicDone.setEnabled(false);
+                mCallBack.doing(0);
+                Tiny.FileCompressOptions options = new Tiny.FileCompressOptions();
+                Tiny.getInstance().source(mPicturesPaths).batchAsFile().withOptions(options).batchCompress(new FileBatchCallback() {
+                    @Override
+                    public void callback(boolean isSuccess, String[] outfiles, Throwable t) {
+                        if (isSuccess) {
+                            Log.d(Contast.TAG, "调用了图片压缩回调");
+                            mPostService.publicPost(title, content, price, category, outfiles, mCallBack);
+                            return;
+                        }
+                        ToastUtil.showToast(PublicPostActivity.this, "压缩图片失败,使用原始图片发帖", true);
+                        mPostService.publicPost(title, content, price, category, mPicturesPaths, mCallBack);
                     }
-                    ToastUtil.showToast(PublicPostActivity.this, "压缩图片失败,使用原始图片发帖", true);
-                    mPostService.publicPost(title, content, price, category, mPicturesPaths, mCallBack);
-                }
-            });
-            return;
+                });
+                return;
+            }
+            ToastUtil.showToast(MyApplication.getAppContext(), "请添加照片", true);
+        } else {
+            ToastUtil.showToast(MyApplication.getAppContext(), "请添加内容", true);
         }
-        mPostService.publicPost(title, content, price, category, null, mCallBack);
     }
 
     /**
@@ -214,11 +223,11 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
     private void switchPostCategory() {
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("选择发布板块")
-                .setSingleChoiceItems(Contast.POST_CATERGORY, -1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(Contast.POST_CATEGORY, -1, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mTvPublicCategory.setText(Contast.POST_CATERGORY[which]);
+                        mTvPublicCategory.setText(Contast.POST_CATEGORY[which]);
                         dialog.dismiss();
                     }
                 }).create();
@@ -299,6 +308,10 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
         @Override
         public void doFailed() {
+            if (mDialog != null) {
+                mDialog.dismiss();
+            }
+            mTvPublicDone.setEnabled(true);
             ToastUtil.showToast(PublicPostActivity.this, "帖子发布失败", true);
         }
     };

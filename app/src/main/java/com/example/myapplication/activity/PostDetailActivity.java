@@ -1,33 +1,43 @@
 package com.example.myapplication.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
+import com.example.myapplication.adapter.DiscussListViewAdapter;
+import com.example.myapplication.bean.Comment;
 import com.example.myapplication.bean.MyBmobUser;
 import com.example.myapplication.bean.Post;
+import com.example.myapplication.service.PostService;
+import com.example.myapplication.service.PostServiceImpl;
 import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.datatype.BmobPointer;
+
 import cn.bmob.v3.datatype.BmobRelation;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.UpdateListener;
+
 
 /**
  * Create by LuKaiqi on 2019/3/7.
@@ -37,22 +47,64 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
     public static final String POST_ID = "post";//相对应帖子，由intent传递过来
 
-    private static int USER_ACTION = -1; // 0表示点赞，1表示评论，2表示收藏
+    /**
+     *  0表示点赞，1表示添加评论，2表示添加收藏, 3表示咨询交易, 4表示查询评论
+    */
+    public static final int USER_ACTION_THUMBUP = 0;
+
+    public static final int USER_ACTION_DISCUSS = 1;
+
+    public static final int USER_ACTION_COLLECT =2;
+
+    public static final int USER_ACTION_BUSINESS = 3;
+
+    public static final int USER_ACTION_QUERY_DISCUSS = 4;
 
     private String postId;
 
-    private static boolean isThumbUp = false;
+    private PostService mPostService = new PostServiceImpl();
+
+    private boolean isThumbUp = false;
     private Post mPost;
-    private BmobRelation mBmobRelation;
+
     private MyBmobUser mCurrentUser;
 
-    private ImageView mIvBack, mIvPostDetailUserAvatar, mIvPostDetailThumb, mIvPostDetailCollect;
+    private InputMethodManager inputMethodManager;//输入法管理
+
+    private ImageView
+            mIvBack,
+            mIvPostDetailUserAvatar,
+            mIvPostDetailThumb,
+            mIvPostDetailCollect;
+
     private ScrollView mSvPostDetailContent;
+
+    private ListView mLvPostDetailDiscussShow;
+
+    private DiscussListViewAdapter mListViewAdapter;
+
     private RelativeLayout mRlPostDetailUser;
-    private LinearLayout  mLlPostDetailThumb, mLlPostDetailDiscuss, mLlPostDetailCollect, mLlPostDetailPictures;
-    private TextView mTvPostDetailUserName, mTvPostDetailCreateDate, mTvPostDetailPrice, mTvPostDetailBusiness, mTvPostDetailContent;
 
+    private LinearLayout
+            mLlPostDetailThumb,
+            mLlPostDetailCollect,
+            mLlPostDetailPictures,
+            mLlPostDetailDiscuss,
+            mLlPostDetailBottom,
+            mLlPostDetailDiscussInput;
 
+    private TextView
+            mTvPostDetailUserName,
+            mTvPostDetailCreateDate,
+            mTvPostDetailPrice,
+            mTvPostDetailBusiness,
+            mTvPostDetailContent;
+
+    private EditText mEtPostDetailDiscuss;
+
+    private Button mBtnDiscussSubmit;
+
+    private List<Comment> mCommentList = new ArrayList<>();
 
     @Override
     public int setRootLayoutId() {
@@ -83,14 +135,33 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         mIvPostDetailCollect = findViewById(R.id.iv_post_detail_collect);
 
         mTvPostDetailBusiness = findViewById(R.id.tv_post_detail_business);
+
+        mLlPostDetailDiscussInput = findViewById(R.id.ll_post_detail_discuss_input);
+        mEtPostDetailDiscuss = findViewById(R.id.et_post_detail_discuss_content);
+        mBtnDiscussSubmit = findViewById(R.id.btn_post_detail_discuss_submit);
+
+        mLvPostDetailDiscussShow = findViewById(R.id.lv_post_detail_discuss_show);
+
+        mLlPostDetailBottom = findViewById(R.id.ll_post_detail_bottom);
     }
 
     @Override
     public void initData(@Nullable Bundle savedInstanceState) {
+        inputMethodManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
         try {
+            mCurrentUser = BmobUser.getCurrentUser(MyBmobUser.class);
             mPost = (Post) getIntent().getExtras().getSerializable(POST_ID);
+
+            //帖子浏览量+1
+            mPost.setLookCount(mPost.getLookCount() + 1);
+            mPostService.postUpdate(mPost);
+
             postId = mPost.getObjectId();
-            mBmobRelation = mPost.getThumbUpRelation() == null ? new BmobRelation() : mPost.getThumbUpRelation();
+
+            mPostService.postDiscussQuery(postId, mActionListener);
+            mListViewAdapter = new DiscussListViewAdapter(this, mCommentList);
+            mLvPostDetailDiscussShow.setAdapter(mListViewAdapter);
+
             initPostDetailsLayout();//设置帖子详情页面布局
         } catch (Exception e) {
             Log.e(Contast.TAG, "帖子详情initData()出错:" + e);
@@ -105,6 +176,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         setView(mLlPostDetailDiscuss, true);
         setView(mLlPostDetailCollect, true);
         setView(mTvPostDetailBusiness, true);
+        setView(mLlPostDetailDiscussInput, true);
+        mBtnDiscussSubmit.setOnClickListener(this);
     }
 
     @Override
@@ -134,7 +207,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         }
         mTvPostDetailUserName.setText(user.getUsername());
         mTvPostDetailCreateDate.setText("更新于" + mPost.getUpdatedAt());
-        mTvPostDetailPrice.setText("￥" + mPost.getPrice());
+        mTvPostDetailPrice.setText("¥" + mPost.getPrice());
         mTvPostDetailContent.setText(mPost.getContent());
         for (int i = 0; i < mPost.getPicturesUrl().size(); i++) {
             ImageView imageView = new ImageView(this);
@@ -158,7 +231,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 setThumbUp();
                 break;
 
-            case R.id.ll_post_detail_discuss:   //留言，评论
+            case R.id.ll_post_detail_discuss:   //弹出留言，评论区域
+                showDiscussInput();
+                break;
+
+            case R.id.btn_post_detail_discuss_submit: //提交评论
                 discuss();
                 break;
 
@@ -178,30 +255,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      *          *如果用户没有登录，那么就不会触发该方法，因此用户登录成功后点赞的时候应该重新再检查一次
      */
     private void checkThumbUp() {
-        if (BmobUser.isLogin()) {
-            mCurrentUser = BmobUser.getCurrentUser(MyBmobUser.class);
-            BmobQuery<MyBmobUser> query = new BmobQuery<>();
-            Post post = new Post();
-            post.setObjectId(postId);
-            query.addWhereRelatedTo("thumbUpRelation", new BmobPointer(post));
-            Log.d(Contast.TAG, "检查点赞状态");
-            query.findObjects(new FindListener<MyBmobUser>() {
-                @Override
-                public void done(List<MyBmobUser> list, BmobException e) {
-                    if (e == null) {
-                        //先检查该用户是否已经点过赞
-                        Log.d(Contast.TAG, "检查点赞状态2" + "点赞用户数量:" + list.size() + "用户:" + list);
-                        if (list.contains(mCurrentUser) ) {//用户点过了赞
-                            Log.d(Contast.TAG, "用户点过了赞");
-                            isThumbUp = true;
-                            mIvPostDetailThumb.setImageResource(R.drawable.ic_action_thumb_up_select);
-                        } else {
-                            isThumbUp = false;
-                        }
-                        Log.d(Contast.TAG, "" + isThumbUp);
-                    }
-                }
-            });
+        if ((mCurrentUser = BmobUser.getCurrentUser(MyBmobUser.class)) != null) {
+            mPostService.postThumbUpCheck(mCurrentUser, postId, mActionListener);
         }
     }
 
@@ -209,28 +264,62 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      * 帖子点赞
      */
     private void setThumbUp() {
-        checkThumbUp();
+        //checkThumbUp();
         if (BmobUser.isLogin()) {
             if (isThumbUp) {
                 ToastUtil.showToast(PostDetailActivity.this, "点了就别取消嘛,老铁", true);
                 return;
             }
-            mBmobRelation.add(mCurrentUser);
-            mPost.setThumbUpRelation(mBmobRelation);
-            mPost.setLookCount(mPost.getLookCount() + 1);
-            mPost.setThumbUp(mPost.getThumbUp() + 1);
-            USER_ACTION = 0;
             isThumbUp = true;
-            mPost.update(mUpdateListener);
+            BmobRelation relation = mPost.getThumbUpRelation() == null ? new BmobRelation() : mPost.getThumbUpRelation();
+            mPostService.postThumbUp(mCurrentUser, relation, mPost, mActionListener);
         } else {
             startActivity(new Intent(PostDetailActivity.this, LoginOrSignActivity.class));
         }
     }
 
     /**
+     * 显示帖子留言输入框
+     */
+    private void showDiscussInput() {
+        if (BmobUser.isLogin()) {
+            inputMethodManager.toggleSoftInput(0, inputMethodManager.HIDE_NOT_ALWAYS);
+            mLlPostDetailBottom.setVisibility(View.GONE);
+            mLlPostDetailDiscussInput.setVisibility(View.VISIBLE);
+            mEtPostDetailDiscuss.setText("");
+            mEtPostDetailDiscuss.setFocusable(true);
+            mEtPostDetailDiscuss.setFocusableInTouchMode(true);
+            mEtPostDetailDiscuss.requestFocus();
+            inputMethodManager.showSoftInput(mEtPostDetailDiscuss, 0);
+        } else {
+            startActivity(new Intent(PostDetailActivity.this, LoginOrSignActivity.class));
+        }
+
+    }
+
+    /**
+     * 隐藏帖子留言输入框
+     */
+    private void hideDiscussInput() {
+        //评论框消失
+        mLlPostDetailDiscussInput.setVisibility(View.GONE);
+        mLlPostDetailBottom.setVisibility(View.VISIBLE);
+        //隐藏输入法，键盘
+        inputMethodManager.hideSoftInputFromWindow(
+                mEtPostDetailDiscuss.getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    /**
      * 帖子评论留言
      */
     private void discuss() {
+        String content = mEtPostDetailDiscuss.getText().toString();
+        if (!StringUtil.isEmptyContainsSpace(content)) {
+            mPostService.publicDiscuss(postId, content, mCurrentUser, mActionListener);
+        } else {
+            ToastUtil.showToast(this, "评论内容不能为空", true);
+        }
 
     }
 
@@ -238,7 +327,12 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      * 帖子收藏
      */
     private void collect() {
-
+        if ((mCurrentUser = BmobUser.getCurrentUser(MyBmobUser.class)) != null) {
+            BmobRelation relation = mPost.getCollectRelation() == null ? new BmobRelation() : mPost.getCollectRelation();
+            relation.add(mCurrentUser);
+            mPost.setCollectRelation(relation);
+            mPost.setCollect(mPost.getCollect() + 1);
+        }
     }
 
     /**
@@ -249,22 +343,69 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
-     * 帖子更新回调
+     * 帖子操作回调
      */
-    private UpdateListener mUpdateListener = new UpdateListener() {
+    private PostService.IPostActionListener mActionListener = new PostService.IPostActionListener() {
         @Override
-        public void done(BmobException e) {
-            if (e == null) {
-                if (USER_ACTION == 0) {
+        public void doSucceed(int actionType, List<? extends Object> list) {
+            switch (actionType) {
+                case USER_ACTION_THUMBUP:
+                    isThumbUp = true;
                     mIvPostDetailThumb.setImageResource(R.drawable.ic_action_thumb_up_select);
-                } else if (USER_ACTION == 1) {
+                    break;
 
-                } else if (USER_ACTION == 2) {
+                case USER_ACTION_DISCUSS:
+                    hideDiscussInput();
+                    ToastUtil.showToast(MyApplication.getAppContext(), "评论帖子成功", true);
+                    Comment comment = new Comment();
+                    comment.setUser(mCurrentUser);
+                    comment.setPost(mPost);
+                    comment.setContent((String) list.get(0));
+                    mCommentList.add(comment);
+                    mListViewAdapter.notifyDataSetChanged();
+                    break;
 
-                }
-            } else {
-                Log.e(Contast.TAG, "帖子详情操作出错:" + e);
-                ToastUtil.showToast(PostDetailActivity.this, "出错了,稍后再试", true);
+                case USER_ACTION_COLLECT:
+                    break;
+
+                case USER_ACTION_BUSINESS:
+                    break;
+
+                case USER_ACTION_QUERY_DISCUSS:
+                    mCommentList.addAll((List<Comment>) list);
+                    if (mListViewAdapter != null) {
+                        Log.d(Contast.TAG, mCommentList.get(0).getContent() + "");
+                        mListViewAdapter.notifyDataSetChanged();
+                    }
+                    break;
+            }
+        }
+
+        @Override
+        public void doFailed(int actionType, Exception e) {
+            switch (actionType) {
+                case USER_ACTION_THUMBUP:
+                    ToastUtil.showToast(MyApplication.getAppContext(), "点赞失败,稍后再试" , true);
+                    Log.e(Contast.TAG, "帖子点赞出错:" + e);
+                    break;
+
+                case USER_ACTION_DISCUSS:
+                    ToastUtil.showToast(MyApplication.getAppContext(), "评论失败,稍后再试" , true);
+                    Log.e(Contast.TAG, "评论帖子失败", e);
+                    break;
+
+                case USER_ACTION_COLLECT:
+                    break;
+
+                case USER_ACTION_BUSINESS:
+                    break;
+
+                case USER_ACTION_QUERY_DISCUSS:
+
+                    break;
+
+                default:
+                    break;
             }
         }
     };
@@ -272,5 +413,40 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onBackPressed() {
         this.finish();
+    }
+
+    /**
+     * 重写触摸事件分发方法，用于检测评论输入焦点检测
+     *          *如果弹出了评论区域，那么进行焦点检测，检测到触摸点位于区域外，则隐藏评论区域
+     * @param ev
+     * @return
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (mLlPostDetailDiscussInput.getVisibility() == View.VISIBLE) {
+            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                //得到获取焦点的view
+                View currentFocus = getCurrentFocus();
+                if (currentFocus instanceof EditText || currentFocus instanceof Button) {
+                    int[] l = {0, 0};
+                    currentFocus.getLocationInWindow(l);
+                    int top = l[1], bottom = top + currentFocus.getHeight();
+                    if (ev.getY() < bottom && ev.getY() > top) {
+                        // 点击评论区域的事件，忽略它。
+                    } else {
+                        hideDiscussInput();
+                    }
+                }
+            }
+        }
+        if (MotionEvent.ACTION_MOVE == ev.getAction()) {
+            View child = mSvPostDetailContent.getChildAt(0);
+            //scrollview滑倒底
+            if (child != null &&
+                    child.getMeasuredHeight() <= mSvPostDetailContent.getScrollY() + mSvPostDetailContent.getHeight()) {
+                mLvPostDetailDiscussShow.getParent().getParent().requestDisallowInterceptTouchEvent(true);
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 }

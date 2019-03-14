@@ -68,7 +68,7 @@
     <string name="post_detail_collect_cancel">取消收藏</string>
     <string name="post_detail_thumb_up">点赞</string>
     <string name="post_detail_thumb_cancel">取消赞</string>
-    <string name="post_detail_discuss">留言评论</string>
+    <string name="post_detail_discuss">留言</string>
     <string name="post_detail_business">咨询交易</string>
     
 </resources>

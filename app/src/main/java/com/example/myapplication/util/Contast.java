@@ -25,6 +25,9 @@ public class Contast {
     public static final int MAX_SELECTED_NUMBER = 9;
 
     /** 帖子类别 */
-    public static final String[] POST_CATERGORY = new String[]{"二手书", "失物招领", "物品找回"};
+    public static final String[] POST_CATEGORY = new String[]{"二手书", "服装", "电子产品", "彩妆"};
+
+    /** 帖子类别key */
+    public static final String POST_CATEGORY_KEY = "category";
 
 }

@@ -4,9 +4,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.View;
 
 import com.example.myapplication.MyApplication;
@@ -15,6 +15,7 @@ import com.example.myapplication.activity.PostDetailActivity;
 import com.example.myapplication.adapter.MyRecyclerViewAdapter;
 import com.example.myapplication.bean.Post;
 import com.example.myapplication.fragment.BaseFragment;
+import com.example.myapplication.fragment.Fragment1;
 import com.example.myapplication.service.PostService;
 import com.example.myapplication.service.PostServiceImpl;
 import com.example.myapplication.util.Contast;
@@ -23,39 +24,39 @@ import com.example.myapplication.util.ToastUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.FindListener;
-
 /**
  * Create by LuKaiqi on 2019/2/17.
- * function:首页-二手书
+ * function:帖子展示
  */
-public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
+public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
                                                           MyRecyclerViewAdapter.OnItemClickListener {
+    private RecyclerView mRecyclerViewData;
 
-    private RecyclerView mRecyclerViewBook;
     private MyRecyclerViewAdapter mAdapter;
 
-    private SwipeRefreshLayout mSrlBook;
+    private SwipeRefreshLayout mSrlCategory;
 
     private List<Post> mBookList = new ArrayList<>();
 
     private PostService postService = new PostServiceImpl();
 
+    /** 帖子类型 */
+    private String mPostCategory;
+
     @Override
     public int setLayoutId() {
-        return R.layout.fragment_book;
+        return R.layout.fragment_category;
     }
 
     @Override
     public void initViews(View view) {
-        mRecyclerViewBook = view.findViewById(R.id.rv_book_list);
-        mSrlBook = view.findViewById(R.id.srl_book_list);
+        mRecyclerViewData = view.findViewById(R.id.rv_book_list);
+        mSrlCategory = view.findViewById(R.id.srl_book_list);
     }
 
     @Override
     public void initData() {
+        mPostCategory = getArguments().getString(Contast.POST_CATEGORY_KEY);
         initSwipeRefreshLayout();
         initRecyclerView();
         onRefresh();//进入该页面就刷新获取数据
@@ -63,7 +64,7 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
 
     @Override
     public void initListener() {
-        mSrlBook.setOnRefreshListener(this);
+        mSrlCategory.setOnRefreshListener(this);
         mAdapter.setOnItemClickListener(this);
     }
 
@@ -73,16 +74,16 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
      * 设置刷新背景
      */
     private void initSwipeRefreshLayout() {
-        mSrlBook.setColorSchemeColors(Color.BLUE,
+        mSrlCategory.setColorSchemeColors(Color.BLUE,
                 Color.GREEN,
                 Color.YELLOW,
                 Color.RED);
         // 设置手指在屏幕下拉多少距离会触发下拉刷新
-        mSrlBook.setDistanceToTriggerSync(300);
+        mSrlCategory.setDistanceToTriggerSync(300);
         // 设定下拉圆圈的背景
-        mSrlBook.setProgressBackgroundColorSchemeColor(getResources().getColor(R.color.fragment1_line_color));
+        mSrlCategory.setProgressBackgroundColorSchemeColor(getResources().getColor(R.color.fragment1_line_color));
         // 设置圆圈的大小
-        mSrlBook.setSize(SwipeRefreshLayout.DEFAULT);
+        mSrlCategory.setSize(SwipeRefreshLayout.DEFAULT);
     }
 
     /**
@@ -91,8 +92,20 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
      */
     private void initRecyclerView() {
         mAdapter = new MyRecyclerViewAdapter(getActivity(), mBookList);
-        mRecyclerViewBook.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        mRecyclerViewBook.setAdapter(mAdapter);
+        chooseLayoutManager();
+        mRecyclerViewData.setAdapter(mAdapter);
+    }
+
+    /**
+     * 设置布局管理器
+     *         *瀑布流
+     *         *列表
+     */
+    private void chooseLayoutManager() {
+
+        //mRecyclerViewData.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+
+        mRecyclerViewData.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     /**
@@ -105,20 +118,18 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
             @Override
             public void getSucceed(List<Post> postList) {
                 int postUpdateCount = postList.size() - mBookList.size();
-                if (postUpdateCount > 0) {
-                    mBookList.clear();
-                    mBookList.addAll(postList);
-                    mAdapter.notifyDataSetChanged();
-                }
-                ToastUtil.showToast(MyApplication.getAppContext(), "本次更新帖子数:" + postUpdateCount, true);
+                mBookList.clear();
+                mBookList.addAll(postList);
+                mAdapter.notifyDataSetChanged();
+                ToastUtil.showToast(MyApplication.getAppContext(), "更新完毕", true);
             }
 
             @Override
             public void getFailed() {
                 ToastUtil.showToast(MyApplication.getAppContext(), "刷新失败,稍后再试", true);
             }
-        });
-        mSrlBook.setRefreshing(false);
+        }, mPostCategory);
+        mSrlCategory.setRefreshing(false);
     }
 
     @Override
@@ -135,6 +146,11 @@ public class BookFragment extends BaseFragment implements SwipeRefreshLayout.OnR
 
     }
 
-
-
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            onRefresh();
+        }
+    }
 }

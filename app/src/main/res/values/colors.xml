@@ -29,4 +29,6 @@
     <color name="start_color">#74e9cccc</color>
     <color name="end_color">#b7e74141</color>
 
+    <color name="post_detail_price">#E2CFCF</color>
+
 </resources>
