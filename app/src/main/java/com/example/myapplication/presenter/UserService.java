@@ -1,9 +1,5 @@
 package com.example.myapplication.service;
 
-import com.example.myapplication.bean.MyBmobUser;
-
-import cn.bmob.v3.BmobUser;
-
 /**
  * Create By LuKaiqi 2019/02/25
  * Describe:登录，注册服务

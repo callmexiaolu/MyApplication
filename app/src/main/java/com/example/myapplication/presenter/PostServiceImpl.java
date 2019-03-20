@@ -2,15 +2,11 @@ package com.example.myapplication.service;
 
 import android.util.Log;
 
-import com.example.myapplication.MyApplication;
-import com.example.myapplication.R;
 import com.example.myapplication.activity.PostDetailActivity;
-import com.example.myapplication.bean.Comment;
-import com.example.myapplication.bean.MyBmobUser;
-import com.example.myapplication.bean.Post;
+import com.example.myapplication.model.Comment;
+import com.example.myapplication.model.MyBmobUser;
+import com.example.myapplication.model.Post;
 import com.example.myapplication.util.Contast;
-import com.example.myapplication.util.StringUtil;
-import com.example.myapplication.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;

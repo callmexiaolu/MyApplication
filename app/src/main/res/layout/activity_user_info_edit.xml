@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp">
+
+    <include
+        android:id="@+id/include_info_edit_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/include_back_to_fragment" />
+
+    <TextView
+        style="@style/user_info_edit"
+        android:layout_below="@+id/include_info_edit_back"
+        android:layout_alignParentLeft="true"
+        android:text="@string/user_info_edit_avatar" />
+
+    <com.example.myapplication.widget.RoundRectImageView
+        android:id="@+id/iv_info_edit_avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/include_info_edit_back"
+        android:layout_alignParentRight="true"
+        android:scaleType="centerCrop"
+        app:corner_radius="5dp" />
+
+    <TextView
+        style="@style/user_info_edit"
+        android:layout_below="@+id/iv_info_edit_avatar"
+        android:text="@string/user_info_edit_name" />
+
+    <EditText
+        style="?android:attr/textViewStyle"
+        android:id="@+id/et_info_edit_name"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/iv_info_edit_avatar"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/black" />
+
+    <TextView
+        style="@style/user_info_edit"
+        android:layout_below="@+id/et_info_edit_name"
+        android:text="@string/user_info_edit_sign" />
+
+    <EditText
+        style="?android:attr/textViewStyle"
+        android:id="@+id/et_info_edit_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/et_info_edit_name"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:textSize="16sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="@color/black" />
+
+    <Button
+        android:id="@+id/btn_info_edit_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_info_edit_sign"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/btn_login"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:text="@string/user_info_edit_save" />
+</RelativeLayout>

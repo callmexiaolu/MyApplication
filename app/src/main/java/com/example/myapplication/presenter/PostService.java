@@ -1,14 +1,11 @@
 package com.example.myapplication.service;
 
-import com.example.myapplication.bean.MyBmobUser;
-import com.example.myapplication.bean.Post;
+import com.example.myapplication.model.MyBmobUser;
+import com.example.myapplication.model.Post;
 
 import java.util.List;
 
 import cn.bmob.v3.datatype.BmobRelation;
-import cn.bmob.v3.listener.UpdateListener;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Create By LuKaiqi 2019/02/27

@@ -3,8 +3,8 @@ package com.example.myapplication.service;
 import android.util.Log;
 
 import com.example.myapplication.MyApplication;
-import com.example.myapplication.bean.MyBmobUser;
-import com.example.myapplication.bean.Post;
+import com.example.myapplication.model.MyBmobUser;
+import com.example.myapplication.model.Post;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.SharedUil;
 import com.example.myapplication.util.StringUtil;
@@ -19,7 +19,6 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.CountListener;
 import cn.bmob.v3.listener.FetchUserInfoListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.LogInListener;

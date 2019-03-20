@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="130dp"
     android:layout_width="match_parent"
-    android:layout_marginBottom="10dp"
-    android:background="@color/white">
+    android:paddingBottom="8dp"
+    android:background="@color/fragment1_line_color">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/ll_post_background"
         android:orientation="horizontal">
 
-        <ImageView
+        <com.example.myapplication.widget.RoundRectImageView
             android:id="@+id/iv_browse_post_cover"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent">
-        </ImageView>
+            android:layout_height="match_parent"
+            app:corner_radius="8dp"/>
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -78,16 +80,17 @@
                 android:layout_toRightOf="@+id/iv_browse_post_user_avatar"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="15254832255841"
                 android:gravity="center"
                 android:textColor="@color/black"/>
-
 
             <View
                 android:id="@+id/line_browse_post"
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="0dp"
                 android:background="@color/fragment1_line_color" />
 
         </RelativeLayout>
