@@ -1,8 +1,6 @@
 package com.example.myapplication.fragment;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,13 +13,15 @@ import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.activity.LoginOrSignActivity;
 import com.example.myapplication.activity.SettingsActivity;
-import com.example.myapplication.bean.MyBmobUser;
+import com.example.myapplication.activity.UserInfoEditActivity;
+import com.example.myapplication.model.MyBmobUser;
+import com.example.myapplication.presenter.UserService;
+import com.example.myapplication.presenter.UserServiceImpl;
 import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.NetWorkUtils;
 import com.example.myapplication.util.StringUtil;
 
 import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.FetchUserInfoListener;
 
 /**
  * Create by LuKaiqi on 2019/2/17.
@@ -67,7 +67,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
 
     @Override
     public void initData() {
-        updateUserInfo();
+
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
                 if (!BmobUser.isLogin()) {
                     startActivity(new Intent(getActivity(), LoginOrSignActivity.class));
                 } else {
-
+                    startActivity(new Intent(getActivity(), UserInfoEditActivity.class));
                 }
                 break;
 
@@ -106,21 +106,25 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onResume() {
+        updateUserInfo();
+        super.onResume();
+    }
+
     /**
      * 信息的获取会先从缓存中获取，因此应该进入页面即从后台获取最新数据更新缓存。
      * 更新本地缓存
+     *      **有网络时  从后台加载
+     *      **无网络时  从缓存加载
      */
-    private void updateUserInfo() {
+    private  void updateUserInfo() {
         if (BmobUser.isLogin()) {
-            BmobUser.fetchUserInfo(new FetchUserInfoListener<BmobUser>() {
-                @Override
-                public void done(BmobUser bmobUser, BmobException e) {
-                    if (e == null) {
-                        final MyBmobUser currentUser = BmobUser.getCurrentUser(MyBmobUser.class);
-                        loadUserInfo(currentUser);
-                    }
-                }
-            });
+            if (NetWorkUtils.isNetworkConnected()) {
+                UserService userService = new UserServiceImpl();
+                userService.userInfoUpdateToLocal();
+            }
+            loadUserInfo(BmobUser.getCurrentUser(MyBmobUser.class));
         } else {
             loadDefaultInfo();
         }
@@ -137,7 +141,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
      */
     private void loadUserInfo(MyBmobUser currentUser) {
         if (BmobUser.isLogin()) {
-            String avatarUrl = currentUser.getAvatarFile() == null ? "" : currentUser.getAvatarFile().getFileUrl();
+            String avatarUrl = currentUser.getAvatarFile() == null ? "" : currentUser.getAvatarFile();
             if (!StringUtil.isEmpty(avatarUrl)) {
                 Glide.with(MyApplication.getAppContext()).load(avatarUrl).into(mIvUserAvatar);
             } else {

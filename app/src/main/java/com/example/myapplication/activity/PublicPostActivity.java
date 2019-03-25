@@ -1,16 +1,13 @@
 package com.example.myapplication.activity;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +23,14 @@ import android.widget.TextView;
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.adapter.MyGridViewAdapter;
-import com.example.myapplication.service.IDoCallBack;
-import com.example.myapplication.service.PublicPostService;
-import com.example.myapplication.service.PublicPostServiceImpl;
+import com.example.myapplication.presenter.IDoCallBack;
+import com.example.myapplication.presenter.PostService;
+import com.example.myapplication.presenter.PostServiceImpl;
 import com.example.myapplication.util.Contast;
-import com.example.myapplication.util.FileUtils;
 import com.example.myapplication.util.GifSizeFilter;
 import com.example.myapplication.util.Glide4Engine;
+import com.example.myapplication.util.NetWorkUtils;
+import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
@@ -41,8 +39,6 @@ import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import com.zxy.tiny.Tiny;
 import com.zxy.tiny.callback.FileBatchCallback;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,9 +53,9 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
     private static final int REQUEST_CODE_CHOOSE = 1;
 
-    private List<Uri> mSelected = null;
+    private List<String> mSelected = null;
 
-    private PublicPostService mPostService = new PublicPostServiceImpl();
+    private PostService mPostService = new PostServiceImpl();
 
     private EditText mEtPublicTitle, mEtPublicContent, mEtPublicPrice;
 
@@ -126,7 +122,11 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_public_done://发布帖子
-                publicDone();
+                if (NetWorkUtils.isNetworkConnected()) {
+                    publicDone();
+                } else {
+                    ToastUtil.showToast(MyApplication.getAppContext(), "无法连接网络,请检查网络", true);
+                }
                 break;
 
             case R.id.tv_public_switch_category://选择帖子发布的板块
@@ -165,24 +165,33 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         final String content = mEtPublicContent.getText().toString();
         final String price = mEtPublicPrice.getText().toString();
         final String category = mTvPublicCategory.getText().toString();
-        //图片压缩
-        if (mSelected != null) {
-            Tiny.FileCompressOptions options = new Tiny.FileCompressOptions();
-            Tiny.getInstance().source(mPicturesPaths).batchAsFile().withOptions(options).batchCompress(new FileBatchCallback() {
-                @Override
-                public void callback(boolean isSuccess, String[] outfiles, Throwable t) {
-                    if (isSuccess) {
-                        Log.d(Contast.TAG, "调用了图片压缩回调");
-                        mPostService.publicPost(title, content, price, category, outfiles, mCallBack);
-                        return;
+        if (!StringUtil.isEmptyContainsSpace(title) &&
+                !StringUtil.isEmptyContainsSpace(content) &&
+                !StringUtil.isEmptyContainsSpace(price) &&
+                !StringUtil.isEmpty(category)) {
+            //图片压缩
+            if (mSelected != null) {
+                mTvPublicDone.setEnabled(false);
+                mCallBack.doing(0);
+                Tiny.FileCompressOptions options = new Tiny.FileCompressOptions();
+                Tiny.getInstance().source(mPicturesPaths).batchAsFile().withOptions(options).batchCompress(new FileBatchCallback() {
+                    @Override
+                    public void callback(boolean isSuccess, String[] outfiles, Throwable t) {
+                        if (isSuccess) {
+                            Log.d(Contast.TAG, "调用了图片压缩回调");
+                            mPostService.publicPost(title, content, price, category, outfiles, mCallBack);
+                            return;
+                        }
+                        ToastUtil.showToast(PublicPostActivity.this, "压缩图片失败,使用原始图片发帖", true);
+                        mPostService.publicPost(title, content, price, category, mPicturesPaths, mCallBack);
                     }
-                    ToastUtil.showToast(PublicPostActivity.this, "压缩图片失败,使用原始图片发帖", true);
-                    mPostService.publicPost(title, content, price, category, mPicturesPaths, mCallBack);
-                }
-            });
-            return;
+                });
+                return;
+            }
+            ToastUtil.showToast(MyApplication.getAppContext(), "请添加照片", true);
+        } else {
+            ToastUtil.showToast(MyApplication.getAppContext(), "请添加内容", true);
         }
-        mPostService.publicPost(title, content, price, category, null, mCallBack);
     }
 
     /**
@@ -196,11 +205,12 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
             try {
-                mSelected = Matisse.obtainResult(data);
-                //图片uri转换为path
+                //获取到图片路径
+                mSelected = Matisse.obtainPathResult(data);
+                //图片路径存进数组
                 mPicturesPaths = new String[mSelected.size()];
                 for (int i = 0; i < mSelected.size(); i++) {
-                    mPicturesPaths[i] = FileUtils.getRealFilePath(PublicPostActivity.this, mSelected.get(i));
+                    mPicturesPaths[i] = mSelected.get(i);
                 }
                 //展示所选择的照片
                 showSelectedPostPictures(mSelected);
@@ -217,11 +227,11 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
     private void switchPostCategory() {
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("选择发布板块")
-                .setSingleChoiceItems(Contast.POST_CATERGORY, -1, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(Contast.POST_CATEGORY, -1, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mTvPublicCategory.setText(Contast.POST_CATERGORY[which]);
+                        mTvPublicCategory.setText(Contast.POST_CATEGORY[which]);
                         dialog.dismiss();
                     }
                 }).create();
@@ -232,7 +242,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
      * 展示帖子选择的照片
      * @param selected
      */
-    private void showSelectedPostPictures(List<Uri> selected) {
+    private void showSelectedPostPictures(List<String> selected) {
         mGridViewAdapter = new MyGridViewAdapter(this, selected);
         mGvSelectedPictures.setAdapter(mGridViewAdapter);
         mGridViewAdapter.notifyDataSetChanged();
@@ -270,6 +280,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
             if (mDialog != null) {
                 mDialog.dismiss();
             }
+            mTvPublicDone.setEnabled(true);
             ToastUtil.showToast(PublicPostActivity.this, "发表成功", true);
             PublicPostActivity.this.finish();
         }
@@ -301,6 +312,10 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
         @Override
         public void doFailed() {
+            if (mDialog != null) {
+                mDialog.dismiss();
+            }
+            mTvPublicDone.setEnabled(true);
             ToastUtil.showToast(PublicPostActivity.this, "帖子发布失败", true);
         }
     };

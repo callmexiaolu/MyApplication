@@ -19,6 +19,12 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <!--读取SD卡的权限:打开相册选取图片所必须的权限-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 通知震动 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 录音 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- 后台运行 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".MyApplication"
@@ -30,7 +36,16 @@
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.MainActivity">
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
+        <meta-data
+            android:name="Bmob_APP_KEY"
+            android:value="7620d754d414c483527eb9108d60c75f" />
+
+        <activity
+            android:name=".activity.MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,7 +60,7 @@
 
         <!-- 用于知乎的图片选择库中的拍照功能 -->
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.myapplication.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
@@ -54,8 +69,33 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-        <activity android:name=".activity.SettingsActivity"></activity>
-        <activity android:name=".activity.PublicPostActivity"></activity>
+        <!-- 广播接受器 用于接收对话消息的广播-->
+        <receiver android:name="cn.bmob.newim.core.ConnectChangeReceiver">
+            <intent-filter>
+                <action android:name="cn.bmob.action.RECONNECT" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <!-- 用户即时通讯服务 -->
+        <service
+            android:name="cn.bmob.newim.core.service.BmobIMService"
+            android:process=":bmobcore" />
+        <!-- 接收其他用户发来的信息，然后通知用户 -->
+        <service
+            android:name="cn.bmob.newim.core.service.NotifyService"
+            android:process=":bmobcore" />
+        <!-- 用户重连服务器 -->
+        <service android:name="cn.bmob.newim.core.service.ReConnectService" />
+        <!-- 类似于TCP发送的心跳包 维持双方的长连接 -->
+        <service android:name="cn.bmob.newim.core.service.HeartBeatService" />
+
+        <activity android:name=".activity.SettingsActivity" />
+        <activity android:name=".activity.PublicPostActivity" />
+        <activity android:name=".activity.PostDetailActivity" />
+        <activity android:name=".activity.UserInfoEditActivity" />
+        <activity android:name=".activity.ChatActivity" />
     </application>
 
 </manifest>

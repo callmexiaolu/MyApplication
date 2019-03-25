@@ -1,8 +1,8 @@
 package com.example.myapplication.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.CountDownTimer;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,9 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.service.IDoCallBack;
-import com.example.myapplication.service.LoginService;
-import com.example.myapplication.service.LoginServiceImpl;
+import com.example.myapplication.presenter.IDoCallBack;
+import com.example.myapplication.presenter.UserService;
+import com.example.myapplication.presenter.UserServiceImpl;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
@@ -36,7 +36,7 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
 
     private static boolean CURRENT_LOGIN_MODE = true;// true为使用账号密码登录， false为免密登录
 
-    private LoginService mLoginService = new LoginServiceImpl();
+    private UserService mUserService = new UserServiceImpl();
 
     @Override
     public int setRootLayoutId() {
@@ -136,14 +136,14 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
             case R.id.btn_user_sure_login://确定登录
                 if (CURRENT_LOGIN_MODE) {
                     //使用账号密码登录
-                    mLoginService.userLogin(
+                    mUserService.userLogin(
                             mEtUserAccount.getText().toString(),
                             mEtUserPassword.getText().toString(),
                             loginCallBack);
                 } else {
                     //免密登录
                     if (!StringUtil.isEmpty(mEtUserPhoneCode.getText().toString())) {
-                        mLoginService.userLoginOrSignByPhone
+                        mUserService.userLoginOrSignByPhone
                                 (mEtUserPhoneNumber.getText().toString(),
                                 mEtUserPhoneCode.getText().toString(),
                                 loginCallBack);
@@ -155,7 +155,7 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
 
             case R.id.tv_get_phone_code://获取验证码
                 if (phoneCodeCountTime()) {
-                    mLoginService.userGetPhoneCode(mEtUserPhoneNumber.getText().toString());
+                    mUserService.userGetPhoneCode(mEtUserPhoneNumber.getText().toString());
                 }
                 break;
 
@@ -187,15 +187,29 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
      * @return true 倒计时结束  false 倒计时未结束，不发送短信
      */
     private boolean phoneCodeCountTime() {
-        mTvUserGetPhoneCode.setClickable(false);
-        mTvUserGetPhoneCode.setFocusable(false);
+        new CountDownTimer(60000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mTvUserGetPhoneCode.setEnabled(false);
+                String time = millisUntilFinished / 1000 + "s";
+                mTvUserGetPhoneCode.setText(time);
+            }
+
+            @Override
+            public void onFinish() {
+                mTvUserGetPhoneCode.setEnabled(true);
+                mTvUserGetPhoneCode.setText("重新获取验证码");
+            }
+        }.start();
         return true;
     }
 
     private IDoCallBack loginCallBack = new IDoCallBack() {
         @Override
         public void done() {
-            LoginOrSignActivity.this.startActivity(new Intent(LoginOrSignActivity.this, MainActivity.class));
+            UserService userService = new UserServiceImpl();
+            userService.userInfoUpdateToLocal();
+            finish();
         }
 
         @Override

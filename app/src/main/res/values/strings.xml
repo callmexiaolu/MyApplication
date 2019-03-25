@@ -25,7 +25,7 @@
 
     <string name="rbtn_2">关注</string>
 
-    <string name="rbtn_3">交易</string>
+    <string name="rbtn_3">消息</string>
 
     <string name="rbtn_4">我</string>
 
@@ -61,6 +61,33 @@
     <string name="public_transaction_way">交易方式</string>
     <string name="public_transaction_school">交易方式:校内面交</string>
 
-    <string name="error_gif"></string>
+    <string name="error_gif">无法选择gif</string>
+
+    <!-- 帖子详情 -->
+    <string name="post_detail_collect">收藏</string>
+    <string name="post_detail_collect_cancel">取消收藏</string>
+    <string name="post_detail_thumb_up">点赞</string>
+    <string name="post_detail_thumb_cancel">取消赞</string>
+    <string name="post_detail_discuss">留言</string>
+    <string name="post_detail_business">咨询交易</string>
+
+    <!-- 私聊 -->
+    <string name="chat_activity_add">添加其它</string>
+    <string name="chat_activity_emoticon">添加表情</string>
+    <string name="chat_activity_mike">发送语音</string>
+    <string name="chat_activity_text_message">发送文本消息</string>
+    <string name="chat_activity_text_message_hint">畅所欲言</string>
+
+    <!-- 用户信息编辑 -->
+    <string name="user_info_edit_avatar">头像</string>
+    <string name="user_info_edit_name">用户名</string>
+    <string name="user_info_edit_sign">个性签名</string>
+    <string name="user_info_edit_save">保存</string>
     
+    <!-- 会话列表 fragment3 -->
+    <string name="conversation_description_product">物品封面</string>
+    <string name="conversation_description_avatar">用户头像</string>
+    <string name="conversation_description_name">用户名</string>
+    <string name="conversation_description_message">最后一条消息</string>
+    <string name="conversation_description_last_time">最后日期</string>
 </resources>

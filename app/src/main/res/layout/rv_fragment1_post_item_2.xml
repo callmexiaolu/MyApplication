@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="130dp"
+    android:layout_width="match_parent"
+    android:paddingBottom="8dp"
+    android:background="@color/fragment1_line_color">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ll_post_background"
+        android:orientation="horizontal">
+
+        <com.example.myapplication.widget.RoundRectImageView
+            android:id="@+id/iv_browse_post_cover"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            app:corner_radius="8dp"/>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:paddingLeft="5dp">
+
+            <TextView
+                android:id="@+id/tv_browse_post_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:textColor="@color/font_color"
+                android:layout_margin="5dp"
+                android:text="阿迪达斯正品三叶草XL男款纯棉运动裤,保证新"/>
+
+            <TextView
+                android:id="@+id/tv_browse_post_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="¥100"
+                android:layout_alignLeft="@+id/tv_browse_post_title"
+                android:maxLines="1"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/search_view_color" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/tv_browse_post_look"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_action_look"/>
+
+            <TextView
+                android:id="@+id/tv_browse_post_look"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="10人浏览"/>
+
+
+            <ImageView
+                android:id="@+id/iv_browse_post_user_avatar"
+                android:layout_above="@+id/line_browse_post"
+                android:layout_margin="5dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_action_we_chat"/>
+
+            <TextView
+                android:id="@+id/tv_browse_post_user_name"
+                android:layout_margin="5dp"
+                android:layout_above="@+id/line_browse_post"
+                android:layout_toRightOf="@+id/iv_browse_post_user_avatar"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="15254832255841"
+                android:gravity="center"
+                android:textColor="@color/black"/>
+
+            <View
+                android:id="@+id/line_browse_post"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/fragment1_line_color" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</FrameLayout>

@@ -25,7 +25,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:gravity">center</item>
         <item name="android:button">@null</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">13sp</item>
     </style>
 
 
@@ -117,5 +117,24 @@
         <item name="android:layout_alignParentLeft">true</item>
         <item name="android:layout_alignParentStart">true</item>
         <item name="android:textColor">@color/font_color</item>
+    </style>
+
+    <!-- 帖子详情评论弹窗 -->
+    <style name="Comment_Dialog" parent="@style/AppTheme">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowSoftInputMode">stateAlwaysVisible</item> <!-- 显示键盘 -->
+        <item name="android:backgroundDimAmount">0.5</item>
+    </style>
+
+    <!-- 用户信息编辑 textView样式 -->
+    <style name="user_info_edit">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">center</item>
     </style>
 </resources>

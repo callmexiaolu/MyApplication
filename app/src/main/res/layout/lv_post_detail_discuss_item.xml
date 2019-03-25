@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/fragment1_line_color" />
+
+    <ImageView
+        android:id="@+id/iv_post_detail_discuss_user_avatar"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_action_we_chat"/>
+
+    <TextView
+        android:id="@+id/tv_post_detail_discuss_user_name"
+        android:layout_toRightOf="@+id/iv_post_detail_discuss_user_avatar"
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:text="用户5246251"/>
+
+    <TextView
+        android:id="@+id/tv_post_detail_discuss_content"
+        android:text="价格能低一点🐎"
+        android:layout_alignLeft="@+id/tv_post_detail_discuss_user_name"
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/tv_post_detail_discuss_time"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/tv_post_detail_discuss_user_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="2019-5-7"/>
+
+</RelativeLayout>
