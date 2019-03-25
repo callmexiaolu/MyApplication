@@ -3,7 +3,8 @@ package com.example.myapplication.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,21 +23,28 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.adapter.DiscussListViewAdapter;
-import com.example.myapplication.bean.Comment;
-import com.example.myapplication.bean.MyBmobUser;
-import com.example.myapplication.bean.Post;
-import com.example.myapplication.service.PostService;
-import com.example.myapplication.service.PostServiceImpl;
+import com.example.myapplication.model.Comment;
+import com.example.myapplication.model.MyBmobUser;
+import com.example.myapplication.model.Post;
+import com.example.myapplication.presenter.PostService;
+import com.example.myapplication.presenter.PostServiceImpl;
 import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.NetWorkUtils;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMConversation;
+import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.ConnectionStatus;
+import cn.bmob.newim.listener.ConnectListener;
+import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.v3.BmobUser;
-
 import cn.bmob.v3.datatype.BmobRelation;
+import cn.bmob.v3.exception.BmobException;
 
 
 /**
@@ -50,7 +58,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     /**
      *  0表示点赞，1表示添加评论，2表示添加收藏, 3表示咨询交易, 4表示查询评论
     */
-    public static final int USER_ACTION_THUMBUP = 0;
+    public static final int USER_ACTION_THUMB_UP = 0;
 
     public static final int USER_ACTION_DISCUSS = 1;
 
@@ -65,6 +73,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private PostService mPostService = new PostServiceImpl();
 
     private boolean isThumbUp = false;
+
+    private boolean isCollected = false;
+
+
+
     private Post mPost;
 
     private MyBmobUser mCurrentUser;
@@ -151,13 +164,23 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         try {
             mCurrentUser = BmobUser.getCurrentUser(MyBmobUser.class);
             mPost = (Post) getIntent().getExtras().getSerializable(POST_ID);
+            postId = mPost.getObjectId();
+            mPostService.getPostDataFromServerById(new PostService.IGetPostDataListener() {
+                @Override
+                public void getSucceed(List<Post> postList) {
+                    mPost = postList.get(0);
+                    Log.d(Contast.TAG, "获取到帖子数据");
+                }
 
+                @Override
+                public void getFailed(BmobException e) {
+                    //获取不到最新的帖子详情，不进入该页面
+                    ToastUtil.showToast(PostDetailActivity.this, "无法连接网络,请检查网络", true);
+                    Log.e(Contast.TAG, "获取特定帖子异常", e);
+                }
+            }, postId);
             //帖子浏览量+1
             mPost.setLookCount(mPost.getLookCount() + 1);
-            mPostService.postUpdate(mPost);
-
-            postId = mPost.getObjectId();
-
             mPostService.postDiscussQuery(postId, mActionListener);
             mListViewAdapter = new DiscussListViewAdapter(this, mCommentList);
             mLvPostDetailDiscussShow.setAdapter(mListViewAdapter);
@@ -182,7 +205,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
     @Override
     protected void onResume() {
-        checkThumbUp();
+        checkPostStatus();
         super.onResume();
     }
 
@@ -251,12 +274,13 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
-     * 检查点赞状态。即查询点赞用户列表中是否包含当前用户
+     * 检查收藏点赞状态。即查询点赞用户列表中是否包含当前用户
      *          *如果用户没有登录，那么就不会触发该方法，因此用户登录成功后点赞的时候应该重新再检查一次
      */
-    private void checkThumbUp() {
+    private void checkPostStatus() {
         if ((mCurrentUser = BmobUser.getCurrentUser(MyBmobUser.class)) != null) {
-            mPostService.postThumbUpCheck(mCurrentUser, postId, mActionListener);
+            mPostService.postStatusCheck(mCurrentUser, USER_ACTION_THUMB_UP, postId, mActionListener);
+            mPostService.postStatusCheck(mCurrentUser, USER_ACTION_COLLECT, postId, mActionListener);
         }
     }
 
@@ -264,17 +288,32 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      * 帖子点赞
      */
     private void setThumbUp() {
-        //checkThumbUp();
-        if (BmobUser.isLogin()) {
-            if (isThumbUp) {
-                ToastUtil.showToast(PostDetailActivity.this, "点了就别取消嘛,老铁", true);
-                return;
+        if (NetWorkUtils.isNetworkConnected()) {
+            if (BmobUser.isLogin()) {
+                if (isThumbUp) {
+                    //取消点赞
+                    isThumbUp = false;
+                    mPost.setThumbUp(mPost.getThumbUp() - 1);
+                    Log.d(Contast.TAG, mPost.getThumbUp() + "点赞数");
+                    BmobRelation relation = new BmobRelation();
+                    relation.remove(mCurrentUser);
+                    mPost.setThumbUpRelation(relation);
+                    mIvPostDetailThumb.setImageResource(R.drawable.ic_action_thumb_up);
+                } else {
+                    //增加点赞
+                    isThumbUp = true;
+                    mPost.setThumbUp(mPost.getThumbUp() + 1);
+                    Log.d(Contast.TAG, mPost.getThumbUp() + "点赞数");
+                    BmobRelation relation = new BmobRelation();
+                    relation.add(mCurrentUser);
+                    mPost.setThumbUpRelation(relation);
+                    mIvPostDetailThumb.setImageResource(R.drawable.ic_action_thumb_up_select);
+                }
+            } else {
+                startActivity(new Intent(PostDetailActivity.this, LoginOrSignActivity.class));
             }
-            isThumbUp = true;
-            BmobRelation relation = mPost.getThumbUpRelation() == null ? new BmobRelation() : mPost.getThumbUpRelation();
-            mPostService.postThumbUp(mCurrentUser, relation, mPost, mActionListener);
         } else {
-            startActivity(new Intent(PostDetailActivity.this, LoginOrSignActivity.class));
+            ToastUtil.showToast(this, "无法连接网络,请检查网络", true);
         }
     }
 
@@ -286,7 +325,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             inputMethodManager.toggleSoftInput(0, inputMethodManager.HIDE_NOT_ALWAYS);
             mLlPostDetailBottom.setVisibility(View.GONE);
             mLlPostDetailDiscussInput.setVisibility(View.VISIBLE);
-            mEtPostDetailDiscuss.setText("");
             mEtPostDetailDiscuss.setFocusable(true);
             mEtPostDetailDiscuss.setFocusableInTouchMode(true);
             mEtPostDetailDiscuss.requestFocus();
@@ -327,11 +365,30 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      * 帖子收藏
      */
     private void collect() {
-        if ((mCurrentUser = BmobUser.getCurrentUser(MyBmobUser.class)) != null) {
-            BmobRelation relation = mPost.getCollectRelation() == null ? new BmobRelation() : mPost.getCollectRelation();
-            relation.add(mCurrentUser);
-            mPost.setCollectRelation(relation);
-            mPost.setCollect(mPost.getCollect() + 1);
+        if (NetWorkUtils.isNetworkConnected()) {
+            if (BmobUser.isLogin()) {
+                if (isCollected) {
+                    //取消收藏
+                    isCollected = false;
+                    mPost.setCollect(mPost.getCollect() -1);
+                    BmobRelation relation = new BmobRelation();
+                    relation.remove(mCurrentUser);
+                    mPost.setCollectRelation(relation);
+                    mIvPostDetailCollect.setImageResource(R.drawable.ic_action_collect);
+                } else {
+                    //增加收藏
+                    isCollected = true;
+                    mPost.setCollect(mPost.getCollect() + 1);
+                    BmobRelation relation = new BmobRelation();
+                    relation.add(mCurrentUser);
+                    mPost.setCollectRelation(relation);
+                    mIvPostDetailCollect.setImageResource(R.drawable.ic_action_my_collection);
+                }
+            } else {
+                ToastUtil.showToast(this, "请先登录", true);
+            }
+        } else {
+            ToastUtil.showToast(this, "无法连接网络,请检查网络", true);
         }
     }
 
@@ -339,7 +396,89 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      * 咨询交易
      */
     private void business() {
+        if (NetWorkUtils.isNetworkConnected()) {
+            if (BmobUser.isLogin()) {
+                chatReady();
+            } else {
+                ToastUtil.showToast(this, "请先登录", true);
+            }
+        } else {
+            ToastUtil.showToast(this, "无法连接网络,请检查网络", true);
+        }
+    }
 
+    /**
+     * 为进入聊天模块做准备
+     *      *初始化会话信息
+     *      *连接服务器为会话准备
+     *      *传递聊天用户信息
+     */
+    private void chatReady() {
+        //开始聊天前检测是否连接聊天服务器
+        if (!checkIsConnectServer()) {
+            connectServer();
+            if (!checkIsConnectServer()) {
+                connectServer();
+                ToastUtil.showToast(this, "未连接到IM服务器,无法聊天", true);
+                if (!checkIsConnectServer())
+                    return;
+            }
+        }
+        //用户信息为帖主信息
+        BmobIMUserInfo userInfo = new BmobIMUserInfo(
+                mPost.getAuthor().getObjectId(),
+                mPost.getAuthor().getUsername(),
+                mPost.getAuthor().getAvatarFile());
+        BmobIMConversation conversation = BmobIM.getInstance().startPrivateConversation(userInfo, null);
+        conversation.setConversationTitle(mPost.getAuthor().getUsername());
+        Intent intent = new Intent(this, ChatActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(ChatActivity.CHAT_KEY, conversation);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    /**
+     * 连接聊天服务器
+     */
+    private void connectServer() {
+        final MyBmobUser currentUser = BmobUser.getCurrentUser(MyBmobUser.class);
+        //判断用户是否登录，并且连接状态不是已连接，则进行连接服务器操作
+        if (!TextUtils.isEmpty(currentUser.getObjectId()) &&
+                BmobIM.getInstance().getCurrentStatus().getCode() != ConnectionStatus.CONNECTED.getCode()) {
+            BmobIM.connect(currentUser.getObjectId(), new ConnectListener() {
+                @Override
+                public void done(String s, BmobException e) {
+                    if (e == null) {
+                        //服务器连接成功就发送一个更新事件，同步更新会话及主页的小红点
+                        //更新用户资料，用于在会话页面、聊天页面以及个人信息页面显示
+                        BmobIM.getInstance().
+                                updateUserInfo(
+                                        new BmobIMUserInfo(currentUser.getObjectId(),
+                                                currentUser.getUsername(), currentUser.getAvatarFile()));
+                        //EventBus.getDefault().post(new RefreshEvent());
+                    } else {
+                        Log.e(Contast.TAG, "ChatActivity initData has Error:", e);
+                    }
+                }
+            });
+            //监听连接状态，可通过BmobIM.getInstance().getCurrentStatus()来获取当前的长连接状态
+            BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                @Override
+                public void onChange(ConnectionStatus status) {
+                    Log.d(Contast.TAG, "当前状态:" + status.getMsg());
+                    Log.d(Contast.TAG, "连接状态:" + BmobIM.getInstance().getCurrentStatus().getMsg());
+                }
+            });
+        }
+    }
+
+    /**
+     * 检查是否连接到聊天服务器
+     * @return false 未连接服务器  true  连接到了服务器
+     */
+    private boolean checkIsConnectServer() {
+        return BmobIM.getInstance().getCurrentStatus().getCode() == ConnectionStatus.CONNECTED.getCode();
     }
 
     /**
@@ -349,9 +488,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         @Override
         public void doSucceed(int actionType, List<? extends Object> list) {
             switch (actionType) {
-                case USER_ACTION_THUMBUP:
-                    isThumbUp = true;
+                case USER_ACTION_THUMB_UP:
                     mIvPostDetailThumb.setImageResource(R.drawable.ic_action_thumb_up_select);
+                    isThumbUp = true;
                     break;
 
                 case USER_ACTION_DISCUSS:
@@ -366,42 +505,54 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                     break;
 
                 case USER_ACTION_COLLECT:
+                    mIvPostDetailCollect.setImageResource(R.drawable.ic_action_my_collection);
+                    isCollected = true;
                     break;
 
                 case USER_ACTION_BUSINESS:
                     break;
 
                 case USER_ACTION_QUERY_DISCUSS:
-                    mCommentList.addAll((List<Comment>) list);
-                    if (mListViewAdapter != null) {
-                        Log.d(Contast.TAG, mCommentList.get(0).getContent() + "");
-                        mListViewAdapter.notifyDataSetChanged();
+                    if (list != null && list.size() > 0) {
+                        mCommentList.addAll((List<Comment>) list);
+                        if (mListViewAdapter != null) {
+                            Log.d(Contast.TAG, mCommentList.get(0).getContent() + "");
+                            mListViewAdapter.notifyDataSetChanged();
+                        }
+                    } else {
+                        Log.d(Contast.TAG, "当前帖子没有留言");
                     }
                     break;
             }
         }
 
         @Override
-        public void doFailed(int actionType, Exception e) {
+        public void doFailed(int actionType, BmobException e) {
             switch (actionType) {
-                case USER_ACTION_THUMBUP:
-                    ToastUtil.showToast(MyApplication.getAppContext(), "点赞失败,稍后再试" , true);
-                    Log.e(Contast.TAG, "帖子点赞出错:" + e);
+                case USER_ACTION_THUMB_UP:
+                    isThumbUp = false;
+                    Log.e(Contast.TAG, "检查帖子点赞异常", e);
                     break;
 
                 case USER_ACTION_DISCUSS:
-                    ToastUtil.showToast(MyApplication.getAppContext(), "评论失败,稍后再试" , true);
+                    hideDiscussInput();
+                    if (e.getErrorCode() == 9016) {
+                        ToastUtil.showToast(PostDetailActivity.this, "无法连接网络,请检查网络", true);
+                    }
                     Log.e(Contast.TAG, "评论帖子失败", e);
                     break;
 
                 case USER_ACTION_COLLECT:
+                    isCollected = false;
+                    Log.e(Contast.TAG, "检查帖子收藏异常", e);
                     break;
 
                 case USER_ACTION_BUSINESS:
+                    Log.e(Contast.TAG, "咨询交易出错", e);
                     break;
 
                 case USER_ACTION_QUERY_DISCUSS:
-
+                    Log.e(Contast.TAG, "查询评论出错", e);
                     break;
 
                 default:
@@ -409,6 +560,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             }
         }
     };
+
+    @Override
+    protected void onStop() {
+        if (mCurrentUser != null) {
+            mPostService.postUpdate(mPost);
+        }
+        super.onStop();
+    }
 
     @Override
     public void onBackPressed() {

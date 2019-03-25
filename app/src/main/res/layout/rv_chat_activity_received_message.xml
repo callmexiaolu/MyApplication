@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="15dp">
+
+    <TextView
+        android:id="@+id/tv_receive_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="5dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:text="15:28"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="11dp">
+
+        <com.example.myapplication.widget.RoundRectImageView
+            android:id="@+id/round_iv_receive_avatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_action_we_chat"/>
+
+        <TextView
+            android:id="@+id/tv_receive_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:gravity="left|center"
+            android:layout_toRightOf="@id/round_iv_receive_avatar"
+            android:background="@drawable/chat_left_qp"
+            android:lineSpacingExtra="3dp"
+            android:minWidth="80dp"
+            android:maxWidth="225dp"
+            android:minHeight="40dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="15dp"
+            android:textColor="#1e1e1e"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+</LinearLayout>

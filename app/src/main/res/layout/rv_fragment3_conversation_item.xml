@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_conversation_root"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/white"
+        android:visibility="visible">
+
+        <com.example.myapplication.widget.RoundRectImageView
+            android:id="@+id/round_iv_conversation_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:contentDescription="@string/conversation_description_avatar"
+            app:corner_radius="5dp"
+            android:src="@drawable/ic_action_we_chat"/>
+
+        <TextView
+            android:id="@+id/tv_conversation_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginLeft="10dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_alignTop="@+id/round_iv_conversation_avatar"
+            android:layout_toRightOf="@+id/round_iv_conversation_avatar"
+            android:text="测试用户"
+            android:contentDescription="@string/conversation_description_name"/>
+
+        <TextView
+            android:id="@+id/tv_conversation_last_message"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignLeft="@+id/tv_conversation_user_name"
+            android:layout_below="@+id/tv_conversation_user_name"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textStyle="normal"
+            android:textColor="@color/font_color"
+            android:text="最后一条消息"
+            android:contentDescription="@string/conversation_description_message"/>
+
+        <TextView
+            android:id="@+id/tv_conversation_last_time"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_alignLeft="@+id/tv_conversation_user_name"
+            android:layout_below="@+id/tv_conversation_last_message"
+            android:layout_marginTop="10dp"
+            android:text="2019-05-14 19:25"
+            android:textColor="@color/font_color"
+            android:textSize="10sp"
+            android:contentDescription="@string/conversation_description_last_time"/>
+
+        <com.example.myapplication.widget.RoundRectImageView
+            android:id="@+id/round_iv_conversation_product_cover"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_action_we_chat"
+            android:contentDescription="@string/conversation_description_product"/>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/fragment1_line_color"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/round_iv_conversation_avatar"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_conversation_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="暂时还没有会话信息"
+        android:textColor="@color/font_color"
+        android:textSize="16sp"
+        android:visibility="gone"/>
+</FrameLayout>

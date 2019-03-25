@@ -1,4 +1,4 @@
-package com.example.myapplication.bean;
+package com.example.myapplication.model;
 
 import cn.bmob.v3.BmobObject;
 

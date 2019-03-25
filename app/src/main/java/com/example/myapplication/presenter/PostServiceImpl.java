@@ -1,4 +1,4 @@
-package com.example.myapplication.service;
+package com.example.myapplication.presenter;
 
 import android.util.Log;
 
@@ -69,7 +69,6 @@ public class PostServiceImpl implements PostService {
      *  list1为文件的服务器地址 String类型
      *  ******
      * @param picturesFilePath 照片的绝对路径(这里的照片经过了压缩)
-     * @return
      */
     @Override
     public void picturesUpload(final String[] picturesFilePath, final IUploadPostListener upload) {
@@ -123,10 +122,31 @@ public class PostServiceImpl implements PostService {
             public void done(List<Post> list, BmobException e) {
                 if (e == null) {
                     listener.getSucceed(list);
-                    Log.d(Contast.TAG, "获取到帖子数据");
                 } else {
-                    listener.getFailed();
-                    Log.e(Contast.TAG, "CategoryFragment 刷新帖子异常:" + e);
+                    listener.getFailed(e);
+                }
+            }
+        });
+    }
+
+    /**
+     * 从服务器获取特定帖子
+     * @param listener 回调
+     * @param postId 帖子id
+     */
+    @Override
+    public void getPostDataFromServerById(final IGetPostDataListener listener, String postId) {
+        BmobQuery<Post> query = new BmobQuery<>();
+        query.addWhereEqualTo("objectId", postId);
+        query.include("author");
+        query.findObjects(new FindListener<Post>() {
+            @Override
+            public void done(List<Post> list, BmobException e) {
+                if (e == null) {
+                    listener.getSucceed(list);
+                } else {
+                    listener.getFailed(e);
+
                 }
             }
         });
@@ -134,12 +154,12 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 保存用户帖子信息到服务器
-     * @param title
-     * @param content
-     * @param price
-     * @param category
-     * @param picturesUrls
-     * @param done
+     * @param title 发布帖子标题
+     * @param content 发布帖子内容
+     * @param price 价格
+     * @param category 帖子类别
+     * @param picturesUrls 帖子照片路径
+     * @param done 操作回调
      */
     private void savePostInfo(final String title, final String content,
                               final String price, final String category,
@@ -194,66 +214,41 @@ public class PostServiceImpl implements PostService {
     /**
      * 帖子点赞,收藏状态检查
      * @param mCurrentUser 当前用户
+     * @param checkedType 检查类型
      * @param postId 帖子id
      * @param actionListener 帖子操作回调
      */
     @Override
-    public void postThumbUpCheck(final MyBmobUser mCurrentUser, String postId, final IPostActionListener actionListener) {
+    public void postStatusCheck(final MyBmobUser mCurrentUser, final int checkedType, String postId, final IPostActionListener actionListener) {
         if (mCurrentUser != null) {
             BmobQuery<MyBmobUser> query = new BmobQuery<>();
             Post post = new Post();
             post.setObjectId(postId);
-            query.addWhereRelatedTo("thumbUpRelation", new BmobPointer(post));
-            Log.d(Contast.TAG, "检查点赞收藏状态");
+            if (checkedType == PostDetailActivity.USER_ACTION_THUMB_UP) {
+                query.addWhereRelatedTo(PostService.CHECKED_TYPE_THUMB_UP, new BmobPointer(post));
+            } else if (checkedType == PostDetailActivity.USER_ACTION_COLLECT) {
+                query.addWhereRelatedTo(PostService.CHECKED_TYPE_COLLECTED, new BmobPointer(post));
+            }
             query.findObjects(new FindListener<MyBmobUser>() {
                 @Override
                 public void done(List<MyBmobUser> list, BmobException e) {
                     if (e == null) {
-                        if (list.contains(mCurrentUser) ) {//用户点过了赞
-                            actionListener.doSucceed(PostDetailActivity.USER_ACTION_THUMBUP, list);
-                            Log.d(Contast.TAG, "用户点过了赞");
-                            Log.d(Contast.TAG, "检查点赞状态:" + "点赞用户数量:" + list.size() + "用户:" + list);
+                        if (list.contains(mCurrentUser) ) {//用户点过了赞,或者收藏了
+                            actionListener.doSucceed(checkedType, list);
                         }
                     } else {
-                        actionListener.doFailed(PostDetailActivity.USER_ACTION_THUMBUP, e);
+                        actionListener.doFailed(checkedType, e);
                     }
                 }
             });
         }
     }
 
-    /**
-     * 帖子点赞
-     * @param mCurrentUser 当前用户
-     * @param bmobRelation 帖子点赞的用户列表
-     * @param post 帖子
-     * @param listener 帖子数据更新回调
-     */
-    @Override
-    public void postThumbUp(final MyBmobUser mCurrentUser,
-                            BmobRelation bmobRelation,
-                            Post post,
-                            final IPostActionListener listener) {
-        bmobRelation.add(mCurrentUser);
-        post.setThumbUpRelation(bmobRelation);
-        post.setThumbUp(post.getThumbUp() + 1);
-        Log.d(Contast.TAG, post.getThumbUp() + "");
-        post.update(new UpdateListener() {
-            @Override
-            public void done(BmobException e) {
-                if (e == null) {
-                    listener.doSucceed(PostDetailActivity.USER_ACTION_THUMBUP, null);
-                } else {
-                    listener.doFailed(PostDetailActivity.USER_ACTION_THUMBUP, e);
-                }
-            }
-        });
-    }
 
     /**
      * 帖子评论查询
-     * @param postId
-     * @param actionListener
+     * @param postId 评论帖子的id
+     * @param actionListener 操作回调
      */
     @Override
     public void postDiscussQuery(String postId, final IPostActionListener actionListener) {
@@ -266,13 +261,18 @@ public class PostServiceImpl implements PostService {
             @Override
             public void done(List<Comment> list, BmobException e) {
                 if (e == null) {
-                    actionListener.doSucceed(PostDetailActivity.USER_ACTION_QUERY_DISCUSS, list);
+                    if (list != null && list.size() > 0) {
+                        actionListener.doSucceed(PostDetailActivity.USER_ACTION_QUERY_DISCUSS, list);
+                    } else {
+                        actionListener.doSucceed(PostDetailActivity.USER_ACTION_QUERY_DISCUSS, null);
+                    }
                 } else {
                     actionListener.doFailed(PostDetailActivity.USER_ACTION_QUERY_DISCUSS, e);
                 }
             }
         });
     }
+
 
     /**
      * 更新帖子信息
@@ -283,9 +283,9 @@ public class PostServiceImpl implements PostService {
             @Override
             public void done(BmobException e) {
                 if (e == null) {
-                    Log.d(Contast.TAG, "帖子浏览量+1，当前该帖子浏览量:" + post.getLookCount());
+                    Log.d(Contast.TAG, "更新帖子成功");
                 } else {
-                    Log.e(Contast.TAG, "设置帖子浏览量异常:", e);
+                    Log.e(Contast.TAG, "更新帖子异常:", e);
                 }
             }
         });

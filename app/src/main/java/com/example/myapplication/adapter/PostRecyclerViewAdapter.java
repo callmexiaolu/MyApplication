@@ -2,12 +2,12 @@ package com.example.myapplication.adapter;
 
 /**
  * Create by LuKaiqi on 2019/2/17.
- * function:
+ * function:展示帖子列表所用适配器
  */
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +16,19 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
-import com.example.myapplication.bean.Post;
+import com.example.myapplication.model.Post;
+import com.example.myapplication.widget.RoundRectImageView;
 
 import java.util.List;
 
 
-public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder> {
+public class PostRecyclerViewAdapter extends RecyclerView.Adapter<PostRecyclerViewAdapter.MyViewHolder> {
 
     private Context mContext;
     private List<Post> mPostList;
+    private boolean isGridLayout = true;//true默认瀑布流, false为线性
 
-    public MyRecyclerViewAdapter(Context context, List<Post> postList) {
+    public PostRecyclerViewAdapter(Context context, List<Post> postList) {
         this.mContext = context;
         this.mPostList = postList;
     }
@@ -36,7 +38,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view;
-        view = LayoutInflater.from(mContext).inflate(R.layout.rv_fragment1_post_item_2, viewGroup, false);
+        if (i == 0) {
+            view = LayoutInflater.from(mContext).inflate(R.layout.rv_fragment1_post_item, viewGroup, false);
+        } else {
+            view = LayoutInflater.from(mContext).inflate(R.layout.rv_fragment1_post_item_2, viewGroup, false);
+        }
         return new MyViewHolder(view);
     }
 
@@ -70,14 +76,22 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     @Override
     public int getItemViewType(int position) {
-        return position;
+        return isGridLayout ? 0 : 1;
+    }
+
+    public void setLayoutType(boolean isGridLayout) {
+        this.isGridLayout = isGridLayout;
+    }
+
+    public boolean getLayoutType() {
+        return isGridLayout;
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mTvPostTitle, mTvPostPrice, mTvPostLookCount, mTvPostUserName;
         private ImageView mIvPostUserAvatar;
-        private ImageView mIvPostCover;
+        private RoundRectImageView mIvPostCover;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,19 +122,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     }
 
-    private OnItemClickListener mOnItemClickListener;
+    private IOnRecyclerViewListener mOnItemClickListener;
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(IOnRecyclerViewListener onItemClickListener) {
         this.mOnItemClickListener = onItemClickListener;
     }
 
-    /**
-     * RecyclerView点击时间回调
-     *          *点击监听
-     *          *长按监听
-     */
-    public interface OnItemClickListener{
-        void onItemClick(View view, int position);
-        void onItemLongClick(View view, int position);
-    }
 }

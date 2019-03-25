@@ -2,7 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:id="@+id/ll_search_and_add_post"
@@ -11,7 +12,7 @@
         android:orientation="horizontal"
         android:background="@color/search_view_color">
 
-        <android.support.v7.widget.SearchView
+        <androidx.appcompat.widget.SearchView
             android:id="@+id/search_view_fragment1"
             android:background="@color/white"
             android:layout_width="0dp"
@@ -55,7 +56,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp" />
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
+        android:background="@color/fragment1_line_color"
         android:id="@+id/vp_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

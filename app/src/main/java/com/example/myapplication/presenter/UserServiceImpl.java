@@ -1,4 +1,4 @@
-package com.example.myapplication.service;
+package com.example.myapplication.presenter;
 
 import android.util.Log;
 
@@ -194,10 +194,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 用户信息更新
+     * 用户信息更新到本地缓存
      */
     @Override
-    public void userInfoUpdate() {
+    public void userInfoUpdateToLocal() {
         //查询用户发帖数, 获赞数
         BmobQuery<Post> query = new BmobQuery<>();
         query.addWhereEqualTo("author",BmobUser.getCurrentUser(MyBmobUser.class));
@@ -227,6 +227,50 @@ public class UserServiceImpl implements UserService {
             public void done(BmobUser bmobUser, BmobException e) {
                 if (e == null) {
                     Log.d(Contast.TAG, "done: " + "用户缓存信息同步成功");
+                }
+            }
+        });
+    }
+
+    /**
+     * 保存用户信息到服务器
+     * @param user 需要保存的用户信息
+     * @param callBack 调用回调接口
+     */
+    @Override
+    public void userInfoSave(MyBmobUser user, final IDoCallBack callBack) {
+        user.update(new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+                if (e == null) {
+                    callBack.done();
+                } else {
+                    callBack.doFailed();
+                }
+            }
+        });
+    }
+
+    /**
+     * 查询指定用户信息
+     * @param objectId 指定用户的id
+     * @param listener 查询指定用户回调
+     */
+    @Override
+    public void queryUserInfo(String objectId, final IQueryUserListener listener) {
+        BmobQuery<MyBmobUser> query = new BmobQuery<>();
+        query.addWhereEqualTo("objectId", objectId);
+        query.findObjects(new FindListener<MyBmobUser>() {
+            @Override
+            public void done(List<MyBmobUser> list, BmobException e) {
+                if (e == null) {
+                    if (list.size() > 0) {
+                        listener.succeed(list.get(0));
+                    } else {
+                        listener.succeed(null);
+                    }
+                } else {
+                    listener.failed(e);
                 }
             }
         });

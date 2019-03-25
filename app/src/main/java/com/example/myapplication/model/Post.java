@@ -1,10 +1,9 @@
-package com.example.myapplication.bean;
+package com.example.myapplication.model;
 
 import java.io.Serializable;
 import java.util.List;
 
 import cn.bmob.v3.BmobObject;
-import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.datatype.BmobRelation;
 
 /**

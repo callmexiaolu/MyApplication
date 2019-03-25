@@ -3,7 +3,7 @@ package com.example.myapplication.activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,11 +28,14 @@ import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import com.zxy.tiny.Tiny;
 import com.zxy.tiny.common.FileResult;
-import com.zxy.tiny.common.TinyUtil;
 
+import java.io.File;
 import java.util.List;
 
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UploadFileListener;
 
 /**
  * Create by LuKaiqi on 2019/3/15.
@@ -142,28 +145,39 @@ public class UserInfoEditActivity extends BaseActivity implements View.OnClickLi
      * 保存用户信息到服务器
      */
     private void saveUserInfo() {
-        String sign = mEtUserInfoSign.getText().toString();
-        String name = mEtUserInfoName.getText().toString();
+        final String sign = mEtUserInfoSign.getText().toString();
+        final String name = mEtUserInfoName.getText().toString();
         if (mSelectedAvatarPath != null) {
-            mCurrentUser.setAvatar(mSelectedAvatarPath);
-            mCurrentUser.setSignature(sign);
-            mCurrentUser.setUsername(name);
-            UserService service = new UserServiceImpl();
-            service.userInfoSave(mCurrentUser, new IDoCallBack() {
+            BmobFile bmobFile = new BmobFile(new File(mSelectedAvatarPath));
+            bmobFile.upload(new UploadFileListener() {
                 @Override
-                public void done() {
-                    ToastUtil.showToast(UserInfoEditActivity.this, "保存成功", true);
-                    UserInfoEditActivity.this.finish();
-                }
+                public void done(BmobException e) {
+                    if (e == null) {
+                        mCurrentUser.setAvatar(bmobFile.getFileUrl());
+                        mCurrentUser.setSignature(sign);
+                        mCurrentUser.setUsername(name);
+                        UserService service = new UserServiceImpl();
+                        service.userInfoSave(mCurrentUser, new IDoCallBack() {
+                            @Override
+                            public void done() {
+                                ToastUtil.showToast(UserInfoEditActivity.this, "保存成功", true);
+                                UserInfoEditActivity.this.finish();
+                            }
 
-                @Override
-                public void doing(int totalProgress) {
+                            @Override
+                            public void doing(int totalProgress) {
 
-                }
+                            }
 
-                @Override
-                public void doFailed() {
-
+                            @Override
+                            public void doFailed() {
+                                ToastUtil.showToast(UserInfoEditActivity.this, "保存失败,稍后再试", true);
+                            }
+                        });
+                    } else {
+                        Log.e(Contast.TAG, "UserInfoEdit saveUserInfo() has Error:", e);
+                        ToastUtil.showToast(UserInfoEditActivity.this, "保存失败,稍后再试", true);
+                    }
                 }
             });
         }

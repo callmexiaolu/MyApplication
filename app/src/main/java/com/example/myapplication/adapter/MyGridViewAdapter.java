@@ -21,10 +21,10 @@ import java.util.List;
 public class MyGridViewAdapter extends BaseAdapter {
 
     private Context mContext;
-    private List<Uri> mList;
+    private List<String> mList;
     private LayoutInflater inflater;
 
-    public MyGridViewAdapter(Context mContext, List<Uri> mList) {
+    public MyGridViewAdapter(Context mContext, List<String> mList) {
         this.mContext = mContext;
         this.mList = mList;
         inflater = LayoutInflater.from(mContext);
@@ -57,8 +57,7 @@ public class MyGridViewAdapter extends BaseAdapter {
         ImageView iv = convertView.findViewById(R.id.iv_public_selected_show);
         if (position < mList.size()) {
             //代表+号之前的需要正常显示图片
-            Uri picUrl = mList.get(position); //图片路径
-            Glide.with(mContext).load(picUrl).into(iv);
+            Glide.with(mContext).load(mList.get(position)).into(iv);
         }
         return convertView;
     }

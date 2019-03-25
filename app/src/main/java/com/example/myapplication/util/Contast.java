@@ -30,4 +30,7 @@ public class Contast {
     /** 帖子类别key */
     public static final String POST_CATEGORY_KEY = "category";
 
+    /** 帖子布局切换  true 瀑布流 false 列表 */
+    public static volatile boolean isGridLayout = true;
+
 }

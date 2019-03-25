@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.myapplication.R;
-import com.example.myapplication.bean.Comment;
+import com.example.myapplication.model.Comment;
 import com.example.myapplication.util.StringUtil;
 
 import java.util.List;

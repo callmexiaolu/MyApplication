@@ -1,4 +1,6 @@
-package com.example.myapplication.service;
+package com.example.myapplication.presenter;
+
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * Describe:为了避免传递activity，因此使用接口回调来实现activity的操作

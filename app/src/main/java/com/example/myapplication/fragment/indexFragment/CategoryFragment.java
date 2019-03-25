@@ -3,45 +3,60 @@ package com.example.myapplication.fragment.indexFragment;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.activity.PostDetailActivity;
-import com.example.myapplication.adapter.MyRecyclerViewAdapter;
-import com.example.myapplication.bean.Post;
+import com.example.myapplication.adapter.IOnRecyclerViewListener;
+import com.example.myapplication.adapter.PostRecyclerViewAdapter;
+import com.example.myapplication.model.Post;
 import com.example.myapplication.fragment.BaseFragment;
-import com.example.myapplication.fragment.Fragment1;
-import com.example.myapplication.service.PostService;
-import com.example.myapplication.service.PostServiceImpl;
+import com.example.myapplication.presenter.PostService;
+import com.example.myapplication.presenter.PostServiceImpl;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.exception.BmobException;
+
 /**
  * Create by LuKaiqi on 2019/2/17.
  * function:帖子展示
  */
-public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
-                                                          MyRecyclerViewAdapter.OnItemClickListener {
+public class CategoryFragment
+        extends BaseFragment
+        implements SwipeRefreshLayout.OnRefreshListener, IOnRecyclerViewListener {
+
     private RecyclerView mRecyclerViewData;
 
-    private MyRecyclerViewAdapter mAdapter;
+    private PostRecyclerViewAdapter mRvGridLayoutAdapter, mRvLinearLayoutAdapter;
 
     private SwipeRefreshLayout mSrlCategory;
 
-    private List<Post> mBookList = new ArrayList<>();
+    private StaggeredGridLayoutManager mGridLayoutManager;
+
+    private LinearLayoutManager mLinearLayoutManager;
+
+    private TextView mTvNOData;
+
+    private List<Post> mDataList = new ArrayList<>();
 
     private PostService postService = new PostServiceImpl();
 
     /** 帖子类型 */
     private String mPostCategory;
+
+    private boolean isGridLayout = true;
 
     @Override
     public int setLayoutId() {
@@ -52,20 +67,23 @@ public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout
     public void initViews(View view) {
         mRecyclerViewData = view.findViewById(R.id.rv_book_list);
         mSrlCategory = view.findViewById(R.id.srl_book_list);
+        mTvNOData = view.findViewById(R.id.tv_category_no_data);
     }
 
     @Override
     public void initData() {
         mPostCategory = getArguments().getString(Contast.POST_CATEGORY_KEY);
+        mGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mLinearLayoutManager = new LinearLayoutManager(getActivity());
         initSwipeRefreshLayout();
         initRecyclerView();
-        onRefresh();//进入该页面就刷新获取数据
+
     }
 
     @Override
     public void initListener() {
         mSrlCategory.setOnRefreshListener(this);
-        mAdapter.setOnItemClickListener(this);
+        onRefresh();//进入该页面就刷新获取数据
     }
 
     /**
@@ -91,9 +109,17 @@ public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout
      * 实现瀑布流布局
      */
     private void initRecyclerView() {
-        mAdapter = new MyRecyclerViewAdapter(getActivity(), mBookList);
+        mRecyclerViewData.setHasFixedSize(true);
+
+        mRvGridLayoutAdapter = new PostRecyclerViewAdapter(getActivity(), mDataList);
+        mRvGridLayoutAdapter.setOnItemClickListener(this);
+        mRvGridLayoutAdapter.setLayoutType(true);
+
+        mRvLinearLayoutAdapter = new PostRecyclerViewAdapter(getActivity(), mDataList);
+        mRvLinearLayoutAdapter.setOnItemClickListener(this);
+        mRvLinearLayoutAdapter.setLayoutType(false);
+
         chooseLayoutManager();
-        mRecyclerViewData.setAdapter(mAdapter);
     }
 
     /**
@@ -101,11 +127,14 @@ public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout
      *         *瀑布流
      *         *列表
      */
-    private void chooseLayoutManager() {
-
-        //mRecyclerViewData.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-
-        mRecyclerViewData.setLayoutManager(new LinearLayoutManager(getActivity()));
+    public void chooseLayoutManager() {
+        if (Contast.isGridLayout) {
+            mRecyclerViewData.setLayoutManager(mGridLayoutManager);
+            mRecyclerViewData.setAdapter(mRvGridLayoutAdapter);
+        } else {
+            mRecyclerViewData.setLayoutManager(mLinearLayoutManager);
+            mRecyclerViewData.setAdapter(mRvLinearLayoutAdapter);
+        }
     }
 
     /**
@@ -117,16 +146,32 @@ public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout
         postService.getPostDataFromServer(new PostService.IGetPostDataListener() {
             @Override
             public void getSucceed(List<Post> postList) {
-                int postUpdateCount = postList.size() - mBookList.size();
-                mBookList.clear();
-                mBookList.addAll(postList);
-                mAdapter.notifyDataSetChanged();
-                ToastUtil.showToast(MyApplication.getAppContext(), "更新完毕", true);
+                if (postList != null && postList.size() > 0) {
+                    if (mRecyclerViewData.getVisibility() == View.GONE) {
+                        mRecyclerViewData.setVisibility(View.VISIBLE);
+                        mTvNOData.setVisibility(View.GONE);
+                    }
+                    mDataList.clear();
+                    mDataList.addAll(postList);
+                    if (isGridLayout) {
+                        mRvGridLayoutAdapter.notifyDataSetChanged();
+                    } else {
+                        mRvLinearLayoutAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    mRecyclerViewData.setVisibility(View.GONE);
+                    mTvNOData.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
-            public void getFailed() {
-                ToastUtil.showToast(MyApplication.getAppContext(), "刷新失败,稍后再试", true);
+            public void getFailed(BmobException e) {
+                if (e.getErrorCode() == 9016) {
+                    ToastUtil.showToast(MyApplication.getAppContext(), "无法连接网络,请检查网络", true);
+                }
+                Log.e(Contast.TAG, "CategoryFragment 刷新帖子异常:" + e);
+                mRecyclerViewData.setVisibility(View.GONE);
+                mTvNOData.setVisibility(View.VISIBLE);
             }
         }, mPostCategory);
         mSrlCategory.setRefreshing(false);
@@ -136,7 +181,7 @@ public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout
     public void onItemClick(View view, int position) {
         Intent intent = new Intent(getActivity(), PostDetailActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(PostDetailActivity.POST_ID, mBookList.get(position));
+        bundle.putSerializable(PostDetailActivity.POST_ID, mDataList.get(position));
         intent.putExtras(bundle);
         startActivity(intent);
     }
@@ -151,6 +196,7 @@ public class CategoryFragment extends BaseFragment implements SwipeRefreshLayout
         super.onHiddenChanged(hidden);
         if (!hidden) {
             onRefresh();
+            chooseLayoutManager();
         }
     }
 }

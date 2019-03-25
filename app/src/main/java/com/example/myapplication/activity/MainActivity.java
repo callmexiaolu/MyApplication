@@ -4,36 +4,48 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import com.example.myapplication.R;
+import com.example.myapplication.event.RefreshEvent;
 import com.example.myapplication.fragment.Fragment1;
 import com.example.myapplication.fragment.Fragment2;
 import com.example.myapplication.fragment.Fragment3;
 import com.example.myapplication.fragment.Fragment4;
+import com.example.myapplication.model.MyBmobUser;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.ToastUtil;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.ConnectionStatus;
+import cn.bmob.newim.event.MessageEvent;
+import cn.bmob.newim.event.OfflineMessageEvent;
+import cn.bmob.newim.listener.ConnectListener;
+import cn.bmob.newim.listener.ConnectStatusChangeListener;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * Create By LuKaiqi 2019/02/26
  * Describe:主界面
  */
 public class MainActivity extends BaseActivity {
-
-    //用于在fragment之间传递信息
-    private Handler mHandler;
 
     private List<Fragment> mFragments;
     private RadioGroup mRadioGroup;
@@ -56,13 +68,18 @@ public class MainActivity extends BaseActivity {
     private static final String CURRENT_FRAGMENT = "currentFragment";
 
 
-    private String[] mPermissions = new String[]{
+    public static final String[] mPermissions = new String[]{
             Manifest.permission.INTERNET,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.ACCESS_WIFI_STATE,
             Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.WAKE_LOCK
+            Manifest.permission.WAKE_LOCK,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CAMERA,
+            Manifest.permission.VIBRATE,
+            Manifest.permission.FOREGROUND_SERVICE
     }; //申请权限
 
     List<String> mRefusePermissions = new ArrayList<>();//用户拒绝的权限
@@ -84,6 +101,8 @@ public class MainActivity extends BaseActivity {
         initFragment(savedInstanceState);
         //设置首页为默认展示页面
         setDefaultFragment();
+        //连接到聊天服务器
+        connectServer();
     }
 
     @Override
@@ -91,18 +110,57 @@ public class MainActivity extends BaseActivity {
         mRadioGroup.setOnCheckedChangeListener(mCheckedChangeListener);
     }
 
-    public void setHandler(Handler handler) {
-        this.mHandler = handler;
-    }
 
     private void setDefaultFragment() {
-        mCurrentFragment = mFragments.get(mCurrent);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fl_tab, mCurrentFragment)
-                .commit();
-        mRbtn1.setChecked(true);
-        mRbtn1.setTextColor(Color.rgb(231, 55, 62));
+        try{
+            mCurrentFragment = mFragments.get(mCurrent);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fl_tab, mCurrentFragment)
+                    .commit();
+            mRbtn1.setChecked(true);
+            mRbtn1.setTextColor(Color.rgb(231, 55, 62));
+        } catch (Exception e) {
+            Log.e(Contast.TAG, "MainActivity setDefaultFragment() has Error:", e);
+        }
+
+    }
+
+    /**
+     * 连接到IM服务器，用于聊天
+     */
+    private void connectServer() {
+        if (BmobUser.isLogin()) {
+            final MyBmobUser currentUser = BmobUser.getCurrentUser(MyBmobUser.class);
+            //判断用户是否登录，并且连接状态不是已连接，则进行连接服务器操作
+            if (!TextUtils.isEmpty(currentUser.getObjectId()) &&
+                    BmobIM.getInstance().getCurrentStatus().getCode() != ConnectionStatus.CONNECTED.getCode()) {
+                BmobIM.connect(currentUser.getObjectId(), new ConnectListener() {
+                    @Override
+                    public void done(String s, BmobException e) {
+                        if (e == null) {
+                            //服务器连接成功就发送一个更新事件，同步更新会话及主页的小红点
+                            //更新用户资料，用于在会话页面、聊天页面以及个人信息页面显示
+                            BmobIM.getInstance().
+                                    updateUserInfo(
+                                            new BmobIMUserInfo(currentUser.getObjectId(),
+                                                    currentUser.getUsername(), currentUser.getAvatarFile()));
+                            EventBus.getDefault().post(new RefreshEvent());
+                        } else {
+                            Log.e(Contast.TAG, "ChatActivity initData has Error:", e);
+                        }
+                    }
+                });
+                //监听连接状态，可通过BmobIM.getInstance().getCurrentStatus()来获取当前的长连接状态
+                BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                    @Override
+                    public void onChange(ConnectionStatus status) {
+                        Log.d(Contast.TAG, "当前状态:" + status.getMsg());
+                        Log.d(Contast.TAG, "连接状态:" + BmobIM.getInstance().getCurrentStatus().getMsg());
+                    }
+                });
+            }
+        }
     }
 
     RadioGroup.OnCheckedChangeListener mCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
@@ -195,6 +253,38 @@ public class MainActivity extends BaseActivity {
             mExitTime = System.currentTimeMillis();
         } else {
             finish();
+        }
+    }
+
+    /**
+     * 注册消息接收事件
+     * @param event
+     */
+    //消息接收：通知有在线消息接收
+    @Subscribe
+    public void onEventMainThread(MessageEvent event) {
+        checkRedPoint();
+    }
+
+    /**
+     * 注册离线消息接收事件
+     * @param event
+     */
+    //消息接收：通知有离线消息接收
+    @Subscribe
+    public void onEventMainThread(OfflineMessageEvent event) {
+        checkRedPoint();
+    }
+
+    /**
+     * 会话：获取全部会话的未读消息数量
+     */
+    private void checkRedPoint() {
+        int count = (int) BmobIM.getInstance().getAllUnReadCount();
+        if (count > 0) {
+            //有未读消息,设置Fragment3出现红点
+        } else {
+            //没有未读消息，设置Fragment3不出现红点
         }
     }
 }

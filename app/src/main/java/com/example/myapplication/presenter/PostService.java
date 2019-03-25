@@ -1,4 +1,4 @@
-package com.example.myapplication.service;
+package com.example.myapplication.presenter;
 
 import com.example.myapplication.model.MyBmobUser;
 import com.example.myapplication.model.Post;
@@ -6,6 +6,7 @@ import com.example.myapplication.model.Post;
 import java.util.List;
 
 import cn.bmob.v3.datatype.BmobRelation;
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * Create By LuKaiqi 2019/02/27
@@ -17,6 +18,12 @@ import cn.bmob.v3.datatype.BmobRelation;
  *          *帖子评论，收藏，点赞等
  */
 public interface PostService {
+
+    String CHECKED_TYPE_THUMB_UP = "thumbUpRelation";
+
+    String CHECKED_TYPE_COLLECTED = "collectRelation";
+
+    String CHECKED_TYPE_SELL = "";
 
     /**
      * 发布帖子
@@ -43,8 +50,17 @@ public interface PostService {
 
     /**
      * 从服务器中获取帖子数据
+     * @param listener 回调
+     * @param category 帖子类别
      */
     void getPostDataFromServer(IGetPostDataListener listener, String category);
+
+    /**
+     * 从服务器获取特定帖子
+     * @param listener 回调
+     * @param postId 帖子id
+     */
+    void getPostDataFromServerById(IGetPostDataListener listener, String postId);
 
     /**
      * 帖子评论
@@ -56,21 +72,15 @@ public interface PostService {
     void publicDiscuss(String postId, String discussContent, MyBmobUser user, IPostActionListener actionListener);
 
     /**
-     * 帖子点赞状态检查
+     * 帖子状态检查
      */
-    void postThumbUpCheck(final MyBmobUser mCurrentUser, String postId, final IPostActionListener actionListener);
-
-    /**
-     * 帖子点赞
-     */
-    void postThumbUp(final MyBmobUser mCurrentUser,
-                     BmobRelation bmobRelation,
-                     Post post,
-                     IPostActionListener listener);
+    void postStatusCheck(final MyBmobUser mCurrentUser, int checkedType, String postId, final IPostActionListener actionListener);
 
 
     /**
      * 帖子评论查询
+     * @param postId 帖子对应后台的ObjectId
+     * @param actionListener 帖子操作回调接口
      */
     void postDiscussQuery(String postId, IPostActionListener actionListener);
 
@@ -114,7 +124,7 @@ public interface PostService {
 
         void getSucceed(List<Post> postList);
 
-        void getFailed();
+        void getFailed(BmobException e);
     }
 
     /**
@@ -127,7 +137,7 @@ public interface PostService {
 
         void doSucceed(int actionType, List<? extends Object> list);
 
-        void doFailed(int actionType, Exception e);
+        void doFailed(int actionType, BmobException e);
 
     }
 }

@@ -1,17 +1,18 @@
-package com.example.myapplication.bean;
+package com.example.myapplication.model;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.example.myapplication.util.StringUtil;
 
+import java.io.Serializable;
+
 import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.datatype.BmobFile;
 
 /**
  * Create by LuKaiqi on 2019/1/26.
  * function:
  */
-public class MyBmobUser extends BmobUser {
+public class MyBmobUser extends BmobUser implements Serializable {
 
     private String avatar;//用户头像url
 
@@ -81,4 +82,5 @@ public class MyBmobUser extends BmobUser {
         MyBmobUser other = (MyBmobUser) obj;
         return this.getObjectId().equals(other.getObjectId());
     }
+
 }

@@ -5,10 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +23,13 @@ import android.widget.TextView;
 import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.adapter.MyGridViewAdapter;
-import com.example.myapplication.service.IDoCallBack;
-import com.example.myapplication.service.PostService;
-import com.example.myapplication.service.PostServiceImpl;
+import com.example.myapplication.presenter.IDoCallBack;
+import com.example.myapplication.presenter.PostService;
+import com.example.myapplication.presenter.PostServiceImpl;
 import com.example.myapplication.util.Contast;
-import com.example.myapplication.util.FileUtils;
 import com.example.myapplication.util.GifSizeFilter;
 import com.example.myapplication.util.Glide4Engine;
+import com.example.myapplication.util.NetWorkUtils;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 import com.zhihu.matisse.Matisse;
@@ -54,7 +53,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
 
     private static final int REQUEST_CODE_CHOOSE = 1;
 
-    private List<Uri> mSelected = null;
+    private List<String> mSelected = null;
 
     private PostService mPostService = new PostServiceImpl();
 
@@ -123,7 +122,11 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_public_done://发布帖子
-                publicDone();
+                if (NetWorkUtils.isNetworkConnected()) {
+                    publicDone();
+                } else {
+                    ToastUtil.showToast(MyApplication.getAppContext(), "无法连接网络,请检查网络", true);
+                }
                 break;
 
             case R.id.tv_public_switch_category://选择帖子发布的板块
@@ -202,11 +205,12 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
             try {
-                mSelected = Matisse.obtainResult(data);
-                //图片uri转换为path
+                //获取到图片路径
+                mSelected = Matisse.obtainPathResult(data);
+                //图片路径存进数组
                 mPicturesPaths = new String[mSelected.size()];
                 for (int i = 0; i < mSelected.size(); i++) {
-                    mPicturesPaths[i] = FileUtils.getRealFilePath(PublicPostActivity.this, mSelected.get(i));
+                    mPicturesPaths[i] = mSelected.get(i);
                 }
                 //展示所选择的照片
                 showSelectedPostPictures(mSelected);
@@ -238,7 +242,7 @@ public class PublicPostActivity extends BaseActivity implements View.OnClickList
      * 展示帖子选择的照片
      * @param selected
      */
-    private void showSelectedPostPictures(List<Uri> selected) {
+    private void showSelectedPostPictures(List<String> selected) {
         mGridViewAdapter = new MyGridViewAdapter(this, selected);
         mGvSelectedPictures.setAdapter(mGridViewAdapter);
         mGridViewAdapter.notifyDataSetChanged();

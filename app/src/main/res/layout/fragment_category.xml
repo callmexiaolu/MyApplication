@@ -5,16 +5,27 @@
     android:layout_height="match_parent"
     android:background="@color/fragment1_line_color">
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/srl_book_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_book_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:visibility="visible"/>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+        <TextView
+            android:id="@+id/tv_category_no_data"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="这里空空如也,下拉刷新试试"
+            android:textSize="18sp"
+            android:textColor="@color/font_color"
+            android:visibility="gone"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

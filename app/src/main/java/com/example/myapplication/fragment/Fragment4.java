@@ -1,8 +1,6 @@
 package com.example.myapplication.fragment;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,20 +13,15 @@ import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.activity.LoginOrSignActivity;
 import com.example.myapplication.activity.SettingsActivity;
-import com.example.myapplication.bean.MyBmobUser;
-import com.example.myapplication.bean.Post;
-import com.example.myapplication.service.UserService;
-import com.example.myapplication.service.UserServiceImpl;
+import com.example.myapplication.activity.UserInfoEditActivity;
+import com.example.myapplication.model.MyBmobUser;
+import com.example.myapplication.presenter.UserService;
+import com.example.myapplication.presenter.UserServiceImpl;
 import com.example.myapplication.util.Contast;
 import com.example.myapplication.util.NetWorkUtils;
 import com.example.myapplication.util.StringUtil;
 
-import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.CountListener;
-import cn.bmob.v3.listener.FetchUserInfoListener;
-import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Create by LuKaiqi on 2019/2/17.
@@ -103,7 +96,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
                 if (!BmobUser.isLogin()) {
                     startActivity(new Intent(getActivity(), LoginOrSignActivity.class));
                 } else {
-
+                    startActivity(new Intent(getActivity(), UserInfoEditActivity.class));
                 }
                 break;
 
@@ -129,7 +122,7 @@ public class Fragment4 extends BaseFragment implements View.OnClickListener {
         if (BmobUser.isLogin()) {
             if (NetWorkUtils.isNetworkConnected()) {
                 UserService userService = new UserServiceImpl();
-                userService.userInfoUpdate();
+                userService.userInfoUpdateToLocal();
             }
             loadUserInfo(BmobUser.getCurrentUser(MyBmobUser.class));
         } else {

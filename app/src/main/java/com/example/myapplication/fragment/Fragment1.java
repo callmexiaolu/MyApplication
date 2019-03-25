@@ -1,25 +1,27 @@
 package com.example.myapplication.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.SearchView;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.widget.SearchView;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
+import com.example.myapplication.MyApplication;
 import com.example.myapplication.R;
 import com.example.myapplication.activity.LoginOrSignActivity;
-import com.example.myapplication.activity.MainActivity;
 import com.example.myapplication.activity.PublicPostActivity;
 import com.example.myapplication.adapter.MyViewPagerAdapter;
 import com.example.myapplication.fragment.indexFragment.CategoryFragment;
 import com.example.myapplication.util.Contast;
+import com.example.myapplication.util.NetWorkUtils;
+import com.example.myapplication.util.ToastUtil;
 import com.example.myapplication.widget.ViewPagerIndicator;
 
 import java.util.ArrayList;
@@ -47,10 +49,14 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener {
 
     private CheckBox mCbChooseLayout;
 
+
+
     /**
      * 二手书 ， 服饰， 电子产品， 彩妆
      */
     private CategoryFragment mBookFragment, mClothesFragment, mElectronicFragment, mCosmeticFragment;
+
+    private boolean isGridLayout = true;
 
     @Override
     public int setLayoutId() {
@@ -94,17 +100,34 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.iv_add_post) {
-            if (BmobUser.isLogin()) {
-                startActivity(new Intent(getContext(), PublicPostActivity.class));
-            } else {
-                startActivity(new Intent(getContext(), LoginOrSignActivity.class));
-            }
-        } else if (v.getId() == R.id.cb_fragment1_choose_layout) {
+        switch (v.getId()) {
+            case R.id.iv_add_post:
+                if (NetWorkUtils.isNetworkConnected()) {
+                    if (BmobUser.isLogin()) {
+                        startActivity(new Intent(getContext(), PublicPostActivity.class));
+                    } else {
+                        startActivity(new Intent(getContext(), LoginOrSignActivity.class));
+                    }
+                } else {
+                    ToastUtil.showToast(MyApplication.getAppContext(), "无法连接网络,请检查网络", true);
+                }
+                break;
 
+            case R.id.cb_fragment1_choose_layout:
+                Contast.isGridLayout = !Contast.isGridLayout;
+                ((CategoryFragment) mFragmentList.get(mViewPagerHome.getCurrentItem())).chooseLayoutManager();
+                break;
+
+            default:
+                break;
         }
     }
 
+    /**
+     * 初始化fragment
+     *          setArguments为了传递各个fragment的数据类别
+     *          用于查询各个类别的帖子数据
+     */
     private void initCategoryFragments() {
         Bundle bookBundle = new Bundle();
         bookBundle.putString(Contast.POST_CATEGORY_KEY, Contast.POST_CATEGORY[0]);

@@ -1,19 +1,14 @@
 package com.example.myapplication.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import butterknife.ButterKnife;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.myapplication.MyApplication;
-import com.example.myapplication.util.Contast;
-
-import java.lang.reflect.Field;
 
 /**
  * Create by LuKaiqi on 2019/1/31.
@@ -35,6 +30,7 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (mRootView == null) {
             View view = inflater.inflate(setLayoutId(), container, false);
+            ButterKnife.bind(this, view);
             initViews(view);
             initData();
             initListener();

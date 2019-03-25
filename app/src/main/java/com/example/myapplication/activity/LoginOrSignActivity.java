@@ -1,9 +1,8 @@
 package com.example.myapplication.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,10 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.service.IDoCallBack;
-import com.example.myapplication.service.UserService;
-import com.example.myapplication.service.UserServiceImpl;
-import com.example.myapplication.util.NetWorkUtils;
+import com.example.myapplication.presenter.IDoCallBack;
+import com.example.myapplication.presenter.UserService;
+import com.example.myapplication.presenter.UserServiceImpl;
 import com.example.myapplication.util.StringUtil;
 import com.example.myapplication.util.ToastUtil;
 
@@ -210,7 +208,7 @@ public class LoginOrSignActivity extends BaseActivity implements View.OnClickLis
         @Override
         public void done() {
             UserService userService = new UserServiceImpl();
-            userService.userInfoUpdate();
+            userService.userInfoUpdateToLocal();
             finish();
         }
 

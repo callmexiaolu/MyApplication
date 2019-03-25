@@ -1,4 +1,10 @@
-package com.example.myapplication.service;
+package com.example.myapplication.presenter;
+
+import com.example.myapplication.model.MyBmobUser;
+
+import cn.bmob.newim.event.MessageEvent;
+import cn.bmob.newim.listener.BmobListener1;
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * Create By LuKaiqi 2019/02/25
@@ -64,7 +70,33 @@ public interface UserService {
     void userLoginByQQ();
 
     /**
-     * 用户信息更新
+     * 用户信息更新到本地缓存
      */
-    void userInfoUpdate();
+    void userInfoUpdateToLocal();
+
+    /**
+     * 用户信息保存，即用户修改了信息，同步到服务器
+     * @param user 需要保存的用户信息
+     * @param callBack 调用回调接口
+     */
+    void userInfoSave(MyBmobUser user, IDoCallBack callBack);
+
+    /**
+     * 查询指定用户信息
+     * @param objectId 指定用户的id
+     */
+    void queryUserInfo(String objectId, IQueryUserListener listener);
+
+
+
+    /**
+     * 查询用户回调
+     */
+    interface IQueryUserListener{
+
+        void succeed(MyBmobUser user);
+
+        void failed(BmobException e);
+    }
+
 }
